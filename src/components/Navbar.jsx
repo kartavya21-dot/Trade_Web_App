@@ -19,7 +19,7 @@ export default function Navbar() {
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: "rgba(6,11,24,0.001)",
+        background: "rgba(6,11,24,0.1)",
         backdropFilter: "blur(5px)",
         borderBottom: "1px solid #1e2a45",
         padding: "0 5%",

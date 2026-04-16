@@ -106,7 +106,7 @@ export default function Hero({ markets }) {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Trade <span style={{fontStyle: "italic"}}>Kwiker</span>
+            Trade <span style={{fontStyle: "italic"}}>Super</span>
         </span>
         </h1>
         <p

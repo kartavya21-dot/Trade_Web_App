@@ -1,8 +1,7 @@
 import React, { useState } from "react";
+import { content } from "../assets/assets";
 
 const AnimatedLogo = () => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <div
       style={{
@@ -11,52 +10,34 @@ const AnimatedLogo = () => {
         cursor: "pointer",
         padding: "4px",
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* The "K" Box */}
+      {/* The Image Logo Box */}
       <div
         style={{
-          width: 36,
-          height: 36,
-          background: "linear-gradient(135deg, #6366f1, #06b6d4)",
+          width: 200,
+          height: 58,
           borderRadius: 8,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontWeight: 800,
-          fontSize: 16,
-          color: "#fff",
-          zIndex: 2, // Keeps the icon on top
+          zIndex: 2,
+          // border: "1px solid red",
+          overflow: "hidden", // Ensures image stays within rounded corners
         }}
       >
-        K
+        <img 
+          src={content.logoPng} 
+          alt="Logo"
+          style={{ 
+            scale: 3,
+            marginTop: "10px",
+            width: "100%", // Adjust this percentage to control padding inside the box
+            height: "100%", 
+            objectFit: "contain" // Keeps aspect ratio without stretching
+          }} 
+        />
       </div>
 
-      {/* The Sliding Text Container */}
-      <div
-        style={{
-          maxWidth: isHovered ? "150px" : "0px", // Animates the width
-          opacity: isHovered ? 1 : 0,           // Fades in/out
-          overflow: "hidden",                   // Clips the text while sliding
-          transition: "all 1s cubic-bezier(0.4, 0, 0.2, 1)", // Smooth "springy" feel
-          whiteSpace: "nowrap",                 // Prevents text wrapping during slide
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <span 
-          style={{ 
-            fontWeight: 800, 
-            fontSize: 20, 
-            letterSpacing: -0.5,
-            paddingLeft: 10, // Space between K and Text
-            color: "#1e293b" // Adjust based on your theme
-          }}
-        >
-          Kwik<span style={{ color: "#6366f1" }}>Trade</span>
-        </span>
-      </div>
     </div>
   );
 };
