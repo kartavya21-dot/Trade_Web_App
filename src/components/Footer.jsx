@@ -1,6 +1,6 @@
 import AnimatedLogo from "./AnimatedLogo";
 
-export default function Footer() {
+export default function Footer({modalConfig, setModalConfig}) {
   return (
     <footer
       style={{
@@ -91,11 +91,11 @@ export default function Footer() {
           © 2025 Superstock. All rights reserved.
         </span>
         <div style={{ display: "flex", gap: 20 }}>
-          {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((l) => (
+          {["Privacy Policy", "Terms of Service"].map((l) => (
             <a
               key={l}
-              href="#"
-              style={{ color: "#334455", fontSize: 12, textDecoration: "none" }}
+              onClick={() => setModalConfig({ isOpen: true, type: `${l === "Terms of Service" ? 'terms' : 'privacy'}` })}
+              style={{ color: "#334455", fontSize: 12, textDecoration: "none", cursor: "pointer" }}
             >
               {l}
             </a>

@@ -10,6 +10,9 @@ import Cta from "./components/Cta.jsx";
 import Footer from "./components/Footer.jsx";
 import Reviews from "./components/Reviews.jsx";
 import ContactForm from "./components/ContactForm.jsx";
+import LegalModal from "./components/LegalModal.jsx";
+import { useScroll } from "framer-motion";
+import { useState } from "react";
 
 const MARKETS = [
   { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
@@ -20,6 +23,7 @@ const MARKETS = [
 ];
 
 export default function KwikTrade() {
+  const [modalConfig, setModalConfig] = useState({isOpen: false, type: 'terms'});
   return (
     <div
       style={{
@@ -40,7 +44,12 @@ export default function KwikTrade() {
       <Reviews />
       <ContactForm/>
       {/* <Cta /> */}
-      <Footer />
+      <Footer modalConfig={modalConfig} setModalConfig={setModalConfig}/>
+      <LegalModal 
+        isOpen={modalConfig.isOpen} 
+        type={modalConfig.type} 
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })} 
+      />
     </div>
   );
 }
