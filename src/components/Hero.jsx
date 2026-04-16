@@ -1,4 +1,80 @@
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const WORDS = ["Indian Commodities", "Indian Stocks", "Future & Options"];
+
+function HeroHeading() {
+  const [index, setIndex] = useState(0);
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [speed, setSpeed] = useState(100);
+
+  useEffect(() => {
+    const handleType = () => {
+      const currentFullWord = WORDS[index];
+
+      if (isDeleting) {
+        // Deleting text
+        setDisplayText(currentFullWord.substring(0, displayText.length - 1));
+        setSpeed(50); // Speed up when deleting
+      } else {
+        // Typing text
+        setDisplayText(currentFullWord.substring(0, displayText.length + 1));
+        setSpeed(100);
+      }
+
+      // Logic to switch states
+      if (!isDeleting && displayText === currentFullWord) {
+        // Pause at the end of the word
+        setTimeout(() => setIsDeleting(true), 1500);
+      } else if (isDeleting && displayText === "") {
+        setIsDeleting(false);
+        setIndex((prev) => (prev + 1) % WORDS.length);
+      }
+    };
+
+    const timer = setTimeout(handleType, speed);
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, index, speed]);
+
+  return (
+    <h1
+      style={{
+        fontSize: "clamp(30px, 6vw, 50px)",
+        fontWeight: 800,
+        lineHeight: 1.1,
+        margin: "0 0 24px",
+        letterSpacing: -2,
+        color: "#fff",
+      }}
+    >
+      Trade Smarter,
+      <br />
+      <span
+        style={{
+          background: "linear-gradient(135deg, #6366f1, #06b6d4)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}
+      >
+        Trade in <span style={{ fontStyle: "italic" }}>{displayText}</span>
+        {/* Animated Cursor */}
+        <motion.span
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ repeat: Infinity, duration: 0.8 }}
+          style={{
+            display: "inline-block",
+            marginLeft: "4px",
+            width: "4px",
+            height: "1em",
+            background: "#06b6d4",
+            verticalAlign: "middle",
+          }}
+        />
+      </span>
+    </h1>
+  );
+}
 
 export default function Hero({ markets }) {
   return (
@@ -90,39 +166,36 @@ export default function Hero({ markets }) {
           Build by Traders, For Traders
         </div>
 
-        <h1
-          style={{
-            fontSize: "clamp(48px, 8vw, 80px)", // Slightly larger
-            fontWeight: 800,
-            lineHeight: 1.1,
-            margin: "0 0 24px",
-            letterSpacing: -2,
-            color: "#fff",
-          }}
-        >
-          Trade Smarter,
-          <br />
-          <span
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #06b6d4)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Trade <span style={{ fontStyle: "italic" }}>Super</span>
-          </span>
-        </h1>
+        <HeroHeading />
+        {/* Primary Sub-heading (The "Unlock Bigger..." part) */}
         <p
           style={{
-            fontSize: 18,
-            color: "#8899bb",
-            lineHeight: 1.7,
-            maxWidth: 560,
-            margin: "0 auto 40px",
+            // Scalable: min 18px on mobile, max 28px on desktop
+            fontSize: "clamp(18px, 3vw, 28px)",
+            fontWeight: 700,
+            color: "#f1f5f9", // Brighter color for better readability
+            lineHeight: 1.3,
+            maxWidth: "800px",
+            margin: "0 auto 16px",
+            letterSpacing: "-0.01em",
           }}
         >
-          Fast, reliable platform for trading global financial markets. Zero
-          brokerage, advanced tools, and 24/7 support.
+          Unlock Bigger Profits with the Lowest Brokerage
+        </p>
+
+        {/* Secondary Description (The "Passionate about..." part) */}
+        <p
+          style={{
+            // Scalable: min 14px on mobile, max 18px on desktop
+            fontSize: "clamp(14px, 1.5vw, 18px)",
+            color: "#94a3b8", // Muted slate color
+            lineHeight: 1.6,
+            maxWidth: "700px",
+            margin: "0 auto 32px",
+          }}
+        >
+          Passionate about making money? Take your trading to the next level
+          with a platform designed for simplicity, speed, and success.
         </p>
         <div
           style={{
