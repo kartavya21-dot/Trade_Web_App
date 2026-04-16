@@ -62,13 +62,6 @@ export default function LegalModal({ isOpen, onClose, type }) {
               <div className="space-y-6 text-slate-400 leading-relaxed text-sm">
                 <p className="text-white font-medium">Please read these carefully.</p>
                 <p>{activeContent.text}</p>
-                {/* Dummy Clauses */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="space-y-2">
-                    <h4 className="text-slate-200 font-bold uppercase tracking-wider text-xs">Section {i}.0</h4>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                  </div>
-                ))}
               </div>
             </div>
 
