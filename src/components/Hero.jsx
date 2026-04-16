@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+
 export default function Hero({ markets }) {
   return (
     <section
@@ -107,8 +109,8 @@ export default function Hero({ markets }) {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Trade <span style={{fontStyle: "italic"}}>Super</span>
-        </span>
+            Trade <span style={{ fontStyle: "italic" }}>Super</span>
+          </span>
         </h1>
         <p
           style={{
@@ -130,20 +132,13 @@ export default function Hero({ markets }) {
             flexWrap: "wrap",
           }}
         >
-          <button
-            style={{
-              padding: "12px 25px",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg, #6366f1, #06b6d4)",
-              color: "#fff",
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-80 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all mt-4"
           >
-            Get Started
-          </button>
+            Get in Touch
+          </motion.button>
         </div>
         <p style={{ fontSize: 13, color: "#445566", marginTop: 20 }}>
           Apply in just 1 minute · No credit card required

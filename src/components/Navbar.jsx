@@ -19,7 +19,7 @@ function useIsMobile(breakpoint = 768) {
 }
 
 /* ─── NAVBAR ─── */
-const NAV_LINKS = ["Home", "Features", "About", "Contact"];
+const NAV_LINKS = ["Home", "Features", "Reviews", "Contact"];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
