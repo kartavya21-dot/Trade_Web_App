@@ -8,6 +8,8 @@ import HowItWorks from "./components/HowItWorks.jsx";
 import Faq from "./components/Faq.jsx";
 import Cta from "./components/Cta.jsx";
 import Footer from "./components/Footer.jsx";
+import Reviews from "./components/Reviews.jsx";
+import ContactForm from "./components/ContactForm.jsx";
 
 const MARKETS = [
   { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
@@ -34,8 +36,10 @@ export default function KwikTrade() {
       <Features />
       <MarketTable markets={MARKETS} />
       <HowItWorks />
-      <Faq />
-      <Cta />
+      {/* <Faq /> */}
+      <Reviews />
+      <ContactForm/>
+      {/* <Cta /> */}
       <Footer />
     </div>
   );

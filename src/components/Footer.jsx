@@ -1,3 +1,5 @@
+import AnimatedLogo from "./AnimatedLogo";
+
 export default function Footer() {
   return (
     <footer
@@ -27,21 +29,7 @@ export default function Footer() {
               marginBottom: 12,
             }}
           >
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                background: "linear-gradient(135deg, #6366f1, #06b6d4)",
-                borderRadius: 6,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-              }}
-            >
-              K
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 17 }}>KwikTrade</span>
+            <AnimatedLogo />
           </div>
           <p
             style={{
@@ -100,7 +88,7 @@ export default function Footer() {
         }}
       >
         <span style={{ color: "#334455", fontSize: 12 }}>
-          © 2025 KwikTrade. All rights reserved.
+          © 2025 Superstock. All rights reserved.
         </span>
         <div style={{ display: "flex", gap: 20 }}>
           {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((l) => (
