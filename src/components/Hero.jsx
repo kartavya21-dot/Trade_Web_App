@@ -166,6 +166,8 @@ export default function Hero({ markets }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            flexWrap: "wrap",
+            gap: "10px",
             marginBottom: 20,
           }}
         >
