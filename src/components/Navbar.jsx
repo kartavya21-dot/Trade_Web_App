@@ -158,7 +158,7 @@ export default function Navbar() {
         {NAV_LINKS.map((l, i) => (
           <a 
             key={l} 
-            href="#" 
+            href={`#${l.toLowerCase()}`}
             className="kwik-drawer-link"
             style={{ transitionDelay: `${i * 100}ms` }}
             onClick={() => setMenuOpen(false)}
