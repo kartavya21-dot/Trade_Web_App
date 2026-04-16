@@ -27,7 +27,7 @@ export default function Faq() {
   const [activeFaq, setActiveFaq] = useState(null);
 
   return (
-    <section style={{ padding: "80px 5%", background: "#0a0f1e" }}>
+    <section id="about" style={{ padding: "80px 5%", background: "#0a0f1e" }}>
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2

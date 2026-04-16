@@ -100,7 +100,7 @@ export default function Features() {
   const springX = useSpring(x, { stiffness: 120, damping: 20, mass: 0.5 });
 
   return (
-    <div className="bg-[#020617] min-h-screen font-sans selection:bg-indigo-500/30">
+    <div id="features" className="bg-[#020617] min-h-screen font-sans selection:bg-indigo-500/30">
       <section ref={containerRef} className="relative h-[450vh]">
         <div className="sticky top-0 h-screen flex flex-col justify-center items-center overflow-hidden">
           {/* Header UI (Existing) */}

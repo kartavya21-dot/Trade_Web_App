@@ -1,6 +1,7 @@
 export default function Hero({ markets }) {
   return (
     <section
+      id="home"
       style={{
         padding: "100px 5% 80px",
         textAlign: "center",

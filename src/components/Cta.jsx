@@ -1,6 +1,7 @@
 export default function Cta() {
   return (
     <section
+      id="contact"
       style={{
         padding: "100px 5%",
         textAlign: "center",
