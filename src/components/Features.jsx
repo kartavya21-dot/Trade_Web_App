@@ -1,3 +1,6 @@
+import React, { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from 'framer-motion';
+
 const FEATURES = [
   {
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaUbeEszoLKlrkvmc1DVp8Dyg0FebDZ_hWEg&s",
@@ -32,64 +35,159 @@ const FEATURES = [
 ];
 
 export default function Features() {
+  const containerRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // We increase the height significantly to make the "stickiness" feel substantial
+  // Each card gets roughly 100vh of scroll space
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Calculate the index based on scroll progress
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const index = Math.min(
+      Math.floor(latest * FEATURES.length),
+      FEATURES.length - 1
+    );
+    if (index !== activeIndex) {
+      setActiveIndex(index);
+    }
+  });
+
+  // STRICT SNAPPING LOGIC:
+  // We map the scroll progress to a discrete pixel value.
+  // This ensures the row "stays" at a specific X coordinate for the duration of a segment.
+  const cardWidth = 400; // Width + Gap
+  const x = useTransform(scrollYProgress, (value) => {
+    const index = Math.min(Math.floor(value * FEATURES.length), FEATURES.length - 1);
+    // This returns a "stepped" value: 0, -450, -900, etc.
+    return -(index * cardWidth);
+  });
+
+  // Use a spring with high stiffness and damping for a "mechanical" snap feel
+  const springX = useSpring(x, { 
+    stiffness: 120, 
+    damping: 20,
+    mass: 0.5
+  });
+
   return (
-    <section style={{ padding: "100px 5%", backgroundColor: "#020617" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <div style={{ color: "#6366f1", fontSize: 13, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>
-            Why Kwik Trade
+    <div className="bg-[#020617] min-h-screen font-sans selection:bg-indigo-500/30">
+      {/* Snap Scroll Section */}
+      <section ref={containerRef} className="relative h-[350vh]">
+        <div className="sticky top-0 h-screen flex flex-col justify-center items-center overflow-hidden">
+          
+          {/* Header UI */}
+          <div className="absolute top-20 left-0 w-full px-8 md:px-20 flex justify-between items-end z-10">
+            <div>
+              <h2 className="text-white text-3xl md:text-5xl font-bold tracking-tight">
+                Powerful Features
+              </h2>
+              <p className="text-slate-500 mt-2 font-medium">Precision tools for the modern trader</p>
+            </div>
+            <div className="hidden md:block text-right">
+              <span className="text-slate-700 text-6xl font-black tabular-nums">
+                0{activeIndex + 1}
+              </span>
+            </div>
           </div>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, margin: 0, letterSpacing: -1, color: "#fff" }}>
-            Everything you need to trade like a pro
-          </h2>
+
+          {/* Stepped Track */}
+          <div className="w-full max-w-7xl mx-auto px-10 relative">
+            <motion.div 
+              style={{ x: springX }} 
+              className="flex gap-12 items-center"
+            >
+              {FEATURES.map((feature, index) => (
+                <FeatureCard 
+                  key={index} 
+                  feature={feature} 
+                  index={index} 
+                  isActive={activeIndex === index} 
+                />
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Background Decoration */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-600/10 blur-[120px] rounded-full" />
+          </div>
+
+          {/* Discrete Progress Dots */}
+          <div className="absolute bottom-12 flex gap-3">
+            {FEATURES.map((_, i) => (
+              <motion.div 
+                key={i}
+                animate={{ 
+                  width: activeIndex === i ? 32 : 8,
+                  backgroundColor: activeIndex === i ? "#6366f1" : "#1e293b"
+                }}
+                className="h-2 rounded-full transition-colors"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FeatureCard({ feature, index, isActive }) {
+  return (
+    <motion.div
+      animate={{ 
+        scale: isActive ? 1.05 : 0.9,
+        opacity: isActive ? 1 : 0.3,
+        y: isActive ? -20 : 0
+      }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 150, 
+        damping: 15 
+      }}
+      className="flex-shrink-0 w-[350px] md:w-[400px]"
+    >
+      <div className={`
+        relative group rounded-[2.5rem] overflow-hidden border transition-all duration-500
+        ${isActive ? 'bg-slate-900 border-indigo-500/50 shadow-2xl shadow-indigo-500/10' : 'bg-slate-900/40 border-slate-800 shadow-none'}
+      `}>
+        {/* Visual Header */}
+        <div className="h-56 relative overflow-hidden">
+          <img 
+            src={feature.image} 
+            alt={feature.title} 
+            className={`w-full h-full object-cover transition-transform duration-1000 ${isActive ? 'scale-105' : 'scale-125 grayscale'}`}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
+          
+          {/* Index Chip */}
+          <div className={`
+            absolute top-6 right-6 px-4 py-2 rounded-full backdrop-blur-md border font-mono text-sm font-bold transition-all
+            ${isActive ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' : 'bg-slate-800/20 border-slate-700 text-slate-500'}
+          `}>
+            FEAT_0{index + 1}
+          </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 32 }}>
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              style={{
-                background: "#0d1528",
-                border: "1px solid #1e2a45",
-                borderRadius: 20,
-                overflow: "hidden", // Important to clip the image
-                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                cursor: "pointer",
-                position: "relative",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-12px)";
-                e.currentTarget.style.borderColor = "#6366f1";
-                e.currentTarget.style.boxShadow = "0 20px 40px -10px rgba(99, 102, 241, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.borderColor = "#1e2a45";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {/* Image Area */}
-              <div style={{ width: "100%", height: 180, overflow: "hidden" }}>
-                <img 
-                  src={f.image} 
-                  alt={f.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.8 }}
-                />
-              </div>
-
-              {/* Text Content */}
-              <div style={{ padding: "24px" }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 12px", color: "#fff" }}>
-                  {f.title}
-                </h3>
-                <p style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.6, margin: 0 }}>
-                  {f.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+        {/* Text Area */}
+        <div className="p-10">
+          <h3 className={`text-2xl font-bold mb-4 transition-colors ${isActive ? 'text-white' : 'text-slate-500'}`}>
+            {feature.title}
+          </h3>
+          <p className={`leading-relaxed text-sm md:text-base transition-opacity ${isActive ? 'text-slate-400 opacity-100' : 'text-slate-600 opacity-60'}`}>
+            {feature.desc}
+          </p>
+          
+          {/* Decorative bar */}
+          <div className="mt-8 flex gap-1">
+             <div className={`h-1 rounded-full transition-all duration-700 ${isActive ? 'w-12 bg-indigo-500' : 'w-4 bg-slate-800'}`} />
+             <div className={`h-1 rounded-full transition-all duration-1000 ${isActive ? 'w-4 bg-indigo-500/30' : 'w-4 bg-slate-800'}`} />
+          </div>
         </div>
       </div>
-    </section>
+    </motion.div>
   );
 }
