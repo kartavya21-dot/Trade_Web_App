@@ -36,7 +36,7 @@ export default function MarketTable({ markets }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #1e2a45" }}>
-                {["Market", "Price (USDT)", "24h Change", "Action"].map((h) => (
+                {["Market", "Price (INR)", "24h Change", "Action"].map((h) => (
                   <th
                     key={h}
                     style={{
@@ -74,7 +74,7 @@ export default function MarketTable({ markets }) {
                     {m.name}
                   </td>
                   <td style={{ padding: "16px 20px", color: "#cdd6f4" }}>
-                    ${m.price}
+                    ₹ {m.price}
                   </td>
                   <td
                     style={{

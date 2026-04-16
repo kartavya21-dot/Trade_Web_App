@@ -10,12 +10,11 @@ import Cta from "./components/Cta.jsx";
 import Footer from "./components/Footer.jsx";
 
 const MARKETS = [
-  { name: "BTC/USDT", price: "84,312.40", change: "+2.34%", up: true },
-  { name: "ETH/USDT", price: "3,218.75", change: "+1.87%", up: true },
-  { name: "SOL/USDT", price: "142.30", change: "-0.92%", up: false },
-  { name: "BNB/USDT", price: "598.10", change: "+3.12%", up: true },
-  { name: "XRP/USDT", price: "0.5821", change: "-1.45%", up: false },
-  { name: "ADA/USDT", price: "0.4563", change: "+0.78%", up: true },
+  { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
+  { name: "SENSEX", price: "77,988.75", change: "+1.87%", up: true },
+  { name: "BANK NIFTY", price: "56,086.30", change: "-0.92%", up: false },
+  { name: "FINIFTY", price: "26,343.10", change: "+3.12%", up: true },
+  { name: "NIFTY 100", price: "25,042.30", change: "-1.45%", up: false },
 ];
 
 export default function KwikTrade() {

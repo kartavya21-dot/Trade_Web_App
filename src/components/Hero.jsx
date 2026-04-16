@@ -237,7 +237,7 @@ export default function Hero({ markets }) {
               <div style={{ fontSize: 12, color: "#556677", marginBottom: 4 }}>
                 {m.name}
               </div>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>${m.price}</div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>₹{m.price}</div>
               <div
                 style={{ fontSize: 12, color: m.up ? "#22c55e" : "#ef4444" }}
               >
