@@ -42,11 +42,11 @@ export default function Reviews() {
         <div className="text-center mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            whileInView={{ opacinp: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-white text-4xl md:text-5xl font-black mb-4"
           >
-            Trusted by <span className="text-indigo-500">Global Traders</span>
+            Trusted by <span className="text-indigo-500">Satisfied Traders</span>
           </motion.h2>
           <p className="text-slate-400 max-w-xl mx-auto">
             Join thousands of users who have upgraded their trading experience.

@@ -13,6 +13,7 @@ import ContactForm from "./components/ContactForm.jsx";
 import LegalModal from "./components/LegalModal.jsx";
 import { useScroll } from "framer-motion";
 import { useState } from "react";
+import PaymentSelector from "./components/PaymentSelector.jsx";
 
 const MARKETS = [
   { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
@@ -40,6 +41,7 @@ export default function KwikTrade() {
       <Features />
       <MarketTable markets={MARKETS} />
       <HowItWorks />
+      <PaymentSelector />
       {/* <Faq /> */}
       <Reviews />
       <ContactForm/>
