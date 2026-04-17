@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { content } from "../assets/assets";
 
 const WORDS = ["Indian Commodities", "Indian Stocks", "Future & Options"];
 
@@ -14,18 +15,14 @@ function HeroHeading() {
       const currentFullWord = WORDS[index];
 
       if (isDeleting) {
-        // Deleting text
         setDisplayText(currentFullWord.substring(0, displayText.length - 1));
-        setSpeed(50); // Speed up when deleting
+        setSpeed(50);
       } else {
-        // Typing text
         setDisplayText(currentFullWord.substring(0, displayText.length + 1));
         setSpeed(100);
       }
 
-      // Logic to switch states
       if (!isDeleting && displayText === currentFullWord) {
-        // Pause at the end of the word
         setTimeout(() => setIsDeleting(true), 1500);
       } else if (isDeleting && displayText === "") {
         setIsDeleting(false);
@@ -58,7 +55,6 @@ function HeroHeading() {
         }}
       >
         Trade in <span style={{ fontStyle: "italic" }}>{displayText}</span>
-        {/* Animated Cursor */}
         <motion.span
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 0.8 }}
@@ -85,11 +81,10 @@ export default function Hero({ markets }) {
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "#020617", // Dark background to make grid pop
+        backgroundColor: "#020617",
       }}
     >
-
-      {/* Your existing glow effect (keep this) */}
+      {/* Glow Effect */}
       <div
         style={{
           position: "absolute",
@@ -98,7 +93,8 @@ export default function Hero({ markets }) {
           transform: "translateX(-50%)",
           width: 800,
           height: 600,
-          background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
           pointerEvents: "none",
           zIndex: 1,
         }}
@@ -112,7 +108,7 @@ export default function Hero({ markets }) {
           zIndex: 2,
         }}
       >
-        {/* ... Rest of your code (Badge, H1, P, etc.) ... */}
+        {/* Badge */}
         <div
           style={{
             display: "inline-flex",
@@ -125,7 +121,7 @@ export default function Hero({ markets }) {
             fontSize: 13,
             color: "#a5b4fc",
             marginBottom: 28,
-            backdropFilter: "blur(4px)", // Added for extra glass effect
+            backdropFilter: "blur(4px)",
           }}
         >
           <span
@@ -135,20 +131,20 @@ export default function Hero({ markets }) {
               background: "#6366f1",
               borderRadius: "50%",
               display: "inline-block",
-              boxShadow: "0 0 8px #6366f1", // Added glow to the dot
+              boxShadow: "0 0 8px #6366f1",
             }}
           />
           Build by Traders, For Traders
         </div>
 
         <HeroHeading />
-        {/* Primary Sub-heading (The "Unlock Bigger..." part) */}
+
+        {/* Primary Sub-heading */}
         <p
           style={{
-            // Scalable: min 18px on mobile, max 28px on desktop
             fontSize: "clamp(18px, 3vw, 28px)",
             fontWeight: 700,
-            color: "#f1f5f9", // Brighter color for better readability
+            color: "#f1f5f9",
             lineHeight: 1.3,
             maxWidth: "800px",
             margin: "0 auto 16px",
@@ -158,12 +154,11 @@ export default function Hero({ markets }) {
           Unlock Bigger Profits with the Lowest Brokerage
         </p>
 
-        {/* Secondary Description (The "Passionate about..." part) */}
+        {/* Secondary Description */}
         <p
           style={{
-            // Scalable: min 14px on mobile, max 18px on desktop
             fontSize: "clamp(14px, 1.5vw, 18px)",
-            color: "#94a3b8", // Muted slate color
+            color: "#94a3b8",
             lineHeight: 1.6,
             maxWidth: "700px",
             margin: "0 auto 32px",
@@ -172,6 +167,8 @@ export default function Hero({ markets }) {
           Passionate about making money? Take your trading to the next level
           with a platform designed for simplicity, speed, and success.
         </p>
+
+        {/* Button */}
         <div
           style={{
             display: "flex",
@@ -193,105 +190,99 @@ export default function Hero({ markets }) {
         </p>
       </div>
 
+      {/* --- IMAGE CONTAINER WITH OVERLAY --- */}
       <div
         style={{
-          maxWidth: 900,
+          position: "relative",
+          maxWidth: 900, // Slightly wider for better text flow
           margin: "60px auto 0",
-          background: "#0d1528",
-          border: "1px solid #1e2a45",
           borderRadius: 16,
-          padding: 24,
-          textAlign: "left",
+          overflow: "hidden",
+          boxShadow:
+            "rgba(0, 0, 0, 0.4) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px",
+          border: "1px solid #1e2a45",
         }}
       >
-        <div
+        {/* Animated Text Overlay */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1, duration: 1 }} // Appears after typing
           style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
-            flexWrap: "wrap",
-            gap: "10px",
-            marginBottom: 20,
+            // Darker gradient at bottom for text contrast
+            background:
+              "linear-gradient(to bottom, transparent, rgba(2,6,23,0.85) 100%)",
+            padding: "20px 40px",
           }}
         >
-          <div>
-            <div style={{ fontSize: 13, color: "#556677" }}>
-              Portfolio Value
-            </div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: "#fff" }}>
-              ₹2,45,820.50
-            </div>
-            <div style={{ fontSize: 14, color: "#22c55e" }}>
-              ↑ +₹12,430 (+5.32%) today
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            {["1D", "1W", "1M", "1Y"].map((t) => (
-              <button
-                key={t}
-                style={{
-                  padding: "6px 14px",
-                  borderRadius: 6,
-                  border: "1px solid #1e2a45",
-                  background: t === "1D" ? "#6366f1" : "transparent",
-                  color: t === "1D" ? "#fff" : "#556677",
-                  fontSize: 13,
-                  cursor: "pointer",
-                }}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-        <svg viewBox="0 0 820 120" style={{ width: "100%", height: 120 }}>
-          <defs>
-            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M0,90 C40,85 80,70 120,65 C160,60 200,80 240,60 C280,40 320,50 360,35 C400,20 440,40 480,30 C520,20 560,10 600,15 C640,20 680,10 720,5 C760,0 790,8 820,5 L820,120 L0,120 Z"
-            fill="url(#chartGrad)"
-          />
-          <path
-            d="M0,90 C40,85 80,70 120,65 C160,60 200,80 240,60 C280,40 320,50 360,35 C400,20 440,40 480,30 C520,20 560,10 600,15 C640,20 680,10 720,5 C760,0 790,8 820,5"
-            fill="none"
-            stroke="#6366f1"
-            strokeWidth="2.5"
-          />
-        </svg>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-            gap: 12,
-            marginTop: 20,
-          }}
-        >
-          {markets.slice(0, 4).map((m) => (
-            <div
-              key={m.name}
+          <div style={{ textAlign: "center", maxWidth: 650 }}>
+            {/* Top Line: Clean Sans-Serif */}
+            <span
               style={{
-                background: "#0a0f1e",
-                borderRadius: 10,
-                padding: "12px 14px",
-                border: "1px solid #1e2a45",
+                fontFamily: "'Inter', sans-serif",
+                color: "white",
+                fontSize: "clamp(24px, 4vw, 42px)",
+                fontWeight: 800,
+                display: "block",
+                marginBottom: 4,
+                textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+                letterSpacing: "-0.04em",
               }}
             >
-              <div style={{ fontSize: 12, color: "#556677", marginBottom: 4 }}>
-                {m.name}
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>₹{m.price}</div>
-              <div
-                style={{ fontSize: 12, color: m.up ? "#22c55e" : "#ef4444" }}
+              Get Higher Profits,
+            </span>
+
+            {/* Bottom Line with Contrast Font */}
+            <span
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                color: "#e2e8f0", // Subtle grey
+                fontSize: "clamp(18px, 3vw, 30px)",
+                fontWeight: 600,
+                display: "block",
+                letterSpacing: "-0.02em",
+                textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+              }}
+            >
+              at{" "}
+              {/* --- HIGHLIGHTED PHRASE: DIFFERENT FONT --- */}
+              <span
+                style={{
+                  // Elegant Serif Font for highlighting
+                  fontFamily: "'DM Serif Display', serif",
+                  // and use a bright accent color
+                  color: "#22d3ee", // Cyan-400
+                  fontSize: "1.1em", // Slightly larger
+                  fontStyle: "italic",
+                  // and add a glowing text shadow
+                  textShadow: "0 0 15px rgba(34,211,238,0.4)",
+                  fontWeight: 400,
+                }}
               >
-                {m.change}
-              </div>
-            </div>
-          ))}
-        </div>
+                minimum Brokerage
+              </span>
+            </span>
+          </div>
+        </motion.div>
+
+        {/* The Image */}
+        <img
+          src={content.hero}
+          alt="Trading Platform Dashboard"
+          style={{
+            width: "100%",
+            height: "auto",
+            display: "block",
+            background: "#0d1528",
+            filter: "brightness(0.9)", // Subtly darkens image to help text stand out
+          }}
+        />
       </div>
     </section>
   );
