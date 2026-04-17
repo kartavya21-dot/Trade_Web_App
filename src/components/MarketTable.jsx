@@ -27,17 +27,24 @@ const markets = [
 ];
 
 const handleSubmit = (m) => {
-    const ownerEmail = "owner@example.com"; // Replace with your email
-    const subject = encodeURIComponent(`Trading Onboarding Request`);
+    
+    // 1. Configuration
+    const phoneNumber = "919876543210"; // REPLACE with your WhatsApp number (include country code, NO '+' or '-')
     
     // Constructing the body text
-    const body = encodeURIComponent(
+    const message = (
       `Hello,\n\nI am interested in starting my trading journey. I want info related to ${m.name}\n\n` +
       `Please get in touch with me for onboarding.`
     );
 
-    // Redirecting the user
-    window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+    const encodedMessage = encodeURIComponent(message);
+
+    // 4. Redirect to WhatsApp
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Using window.open allows them to stay on your site while WhatsApp opens in a new tab
+    window.open(whatsappUrl, '_blank');
+  
   };
 
 // Breakpoints

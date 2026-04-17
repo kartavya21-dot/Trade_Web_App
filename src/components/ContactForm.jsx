@@ -17,21 +17,27 @@ export default function ContactForm() {
   // 2. Handler to redirect to email
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const ownerEmail = "owner@example.com"; // Replace with your email
-    const subject = encodeURIComponent(`Trading Onboarding Request - ${formData.fullName}`);
-    
-    // Constructing the body text
-    const body = encodeURIComponent(
-      `Hello,\n\nI am interested in starting my trading journey. Here are my details:\n\n` +
-      `Full Name: ${formData.fullName}\n` +
-      `Email Address: ${formData.email}\n` +
-      `Contact Number: ${formData.contactNumber}\n\n` +
-      `Please get in touch with me for onboarding.`
-    );
 
-    // Redirecting the user
-    window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+    // 1. Configuration
+    const phoneNumber = "919876543210"; // REPLACE with your WhatsApp number (include country code, NO '+' or '-')
+    
+    // 2. Combine Subject and Body into one string
+    const message = 
+      `*Trading Onboarding Request*\n` + // Asterisks make text BOLD in WhatsApp
+      `--------------------------\n` +
+      `*Name:* ${formData.fullName}\n` +
+      `*Email:* ${formData.email}\n` +
+      `*Contact:* ${formData.contactNumber}\n\n` +
+      `_Please get in touch with me for onboarding._`;
+
+    // 3. Encode the message for a URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // 4. Redirect to WhatsApp
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Using window.open allows them to stay on your site while WhatsApp opens in a new tab
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
