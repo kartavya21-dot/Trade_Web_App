@@ -52,8 +52,8 @@ export default function PaymentSelector() {
                   animate={{ 
                     y: isActive ? -40 : 0, 
                     scale: isActive ? 1.1 : 0.9,
-                    opacity: isActive ? 1 : 0.4,
-                    rotateY: isActive ? 0 : -70,
+                    opacity: isActive ? 1 : 0.8,
+                    rotateY: isActive ? 0 : (activeIndex < i ? -60 : 60),
                   }}
                   transition={{ type: "keyframes", duration: 0.1, stiffness: 100, damping: 15 }}
                   className={`
