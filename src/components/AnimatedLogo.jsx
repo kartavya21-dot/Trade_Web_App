@@ -29,7 +29,7 @@ const AnimatedLogo = () => {
           src={content.logoPng} 
           alt="Logo"
           style={{ 
-            scale: 3,
+            scale: 3.4,
             marginTop: "10px",
             width: "100%", // Adjust this percentage to control padding inside the box
             height: "100%", 

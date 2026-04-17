@@ -55,7 +55,7 @@ export default function Navbar() {
           position: sticky;
           top: 0;
           z-index: 100;
-          background: rgba(6, 11, 24, 0.8);
+          background: rgba(15, 23, 42, 0.1);
           backdrop-filter: blur(12px);
           border-bottom: 1px solid #1e2a45;
           padding: 0 5%;
