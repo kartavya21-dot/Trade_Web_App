@@ -39,7 +39,7 @@ export default function KwikTrade() {
       <Hero markets={MARKETS} />
       <Stats />
       <Features />
-      <MarketTable markets={MARKETS} />
+      <MarketTable />
       <HowItWorks />
       <PaymentSelector />
       {/* <Faq /> */}
