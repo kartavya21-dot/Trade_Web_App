@@ -38,14 +38,26 @@ function HeroHeading() {
     <h1
       style={{
         fontSize: "clamp(30px, 6vw, 50px)",
-        fontWeight: 800,
+        fontWeight: 500,
         lineHeight: 1.1,
         margin: "0 0 24px",
         letterSpacing: -2,
         color: "#fff",
       }}
     >
-      Trade Smarter,
+      Stock Trading With{" "}
+      <span
+        style={{
+          background: "linear-gradient(135deg, #6366f1, #06b6d4)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          fontStyle: "oblique",
+          width: "max-content",
+        }}
+      >
+        500x{" "}
+      </span>{" "}
+      Margin
       <br />
       <span
         style={{
@@ -81,7 +93,7 @@ export default function Hero({ markets }) {
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "#020617",
+        // backgroundColor: "#020617",
       }}
     >
       {/* Glow Effect */}
@@ -134,7 +146,7 @@ export default function Hero({ markets }) {
               boxShadow: "0 0 8px #6366f1",
             }}
           />
-          Build by Traders, For Traders
+          Build for Market Winners
         </div>
 
         <HeroHeading />
@@ -250,8 +262,7 @@ export default function Hero({ markets }) {
                 textShadow: "0 2px 10px rgba(0,0,0,0.5)",
               }}
             >
-              at{" "}
-              {/* --- HIGHLIGHTED PHRASE: DIFFERENT FONT --- */}
+              at {/* --- HIGHLIGHTED PHRASE: DIFFERENT FONT --- */}
               <span
                 style={{
                   // Elegant Serif Font for highlighting

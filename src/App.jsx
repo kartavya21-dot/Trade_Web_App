@@ -14,6 +14,7 @@ import LegalModal from "./components/LegalModal.jsx";
 import { useScroll } from "framer-motion";
 import { useState } from "react";
 import PaymentSelector from "./components/PaymentSelector.jsx";
+import WhyChoose from "./components/WhyChoose.jsx";
 
 const MARKETS = [
   { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
@@ -30,7 +31,7 @@ export default function KwikTrade() {
     <div
       style={{
         fontFamily: "'Inter', sans-serif",
-        background: "#060b18",
+        background: "rgba(6, 11, 24, 0.97)",
         color: "#fff",
         minHeight: "100vh",
         position: "relative", // Needed for absolute children
@@ -61,6 +62,7 @@ export default function KwikTrade() {
       <div style={{ position: "relative", zIndex: 1 }}>
         <Navbar />
         <Hero markets={MARKETS} />
+        <WhyChoose/>
         <Stats />
         <Features />
         <MarketTable />
