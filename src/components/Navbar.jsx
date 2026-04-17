@@ -55,9 +55,9 @@ export default function Navbar() {
           position: sticky;
           top: 0;
           z-index: 100;
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.4);
           // background: rgba(15, 23, 42, 0.8);
-          backdrop-filter: blur(80px);
+          backdrop-filter: blur(120px);
           border-bottom: 1px solid #1e2a45;
           padding: 1.2% 5%;
         }
