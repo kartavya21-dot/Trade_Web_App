@@ -55,11 +55,11 @@ export default function Navbar() {
           position: sticky;
           top: 0;
           z-index: 100;
-          // background: rgba(233, 233, 233, 1);
-          // background: rgba(15, 23, 42, 0.1);
-          backdrop-filter: blur(170px);
+          background: rgba(0, 0, 0, 0.3);
+          // background: rgba(15, 23, 42, 0.8);
+          backdrop-filter: blur(80px);
           border-bottom: 1px solid #1e2a45;
-          padding: 0 5%;
+          padding: 1.2% 5%;
         }
         .kwik-nav-inner {
           max-width: 1200px;
@@ -129,7 +129,7 @@ export default function Navbar() {
 
         @media (min-width: 768px) {
           .kwik-burger { display: none; }
-          .kwik-links { display: flex; gap: 32px; }
+          .kwik-links { display: flex; gap: 32px;}
           .kwik-links a { color: #8899bb; text-decoration: none; font-size: 14px; font-weight: 500; transition: 0.2s; }
           .kwik-links a:hover { color: #fff; }
           .kwik-connect-desktop { display: block; }
