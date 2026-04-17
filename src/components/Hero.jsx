@@ -88,30 +88,6 @@ export default function Hero({ markets }) {
         backgroundColor: "#020617", // Dark background to make grid pop
       }}
     >
-      {/* --- FUTURISTIC GRID START --- */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 0,
-          // Creating the grid lines
-          backgroundImage: `
-            linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: "40px 40px",
-          // Perspective effect
-          transform: "perspective(500px) rotateX(60deg) translateY(-100px)",
-          transformOrigin: "top",
-          // Fade the grid out so it's subtle
-          maskImage:
-            "linear-gradient(to bottom, transparent, black, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent, black, transparent)",
-          pointerEvents: "none",
-        }}
-      />
-      {/* --- FUTURISTIC GRID END --- */}
 
       {/* Your existing glow effect (keep this) */}
       <div
@@ -122,8 +98,7 @@ export default function Hero({ markets }) {
           transform: "translateX(-50%)",
           width: 800,
           height: 600,
-          background:
-            "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
           pointerEvents: "none",
           zIndex: 1,
         }}

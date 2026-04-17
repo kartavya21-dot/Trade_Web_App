@@ -7,6 +7,7 @@ export default function Footer({modalConfig, setModalConfig}) {
         padding: "40px 5% 30px",
         background: "#060b18",
         borderTop: "1px solid #1e2a45",
+        backgroundColor: "rgba(2, 6, 23, 1)",
       }}
     >
       <div

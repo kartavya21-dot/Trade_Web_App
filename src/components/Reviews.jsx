@@ -34,7 +34,7 @@ const REVIEWS = [
 
 export default function Reviews() {
   return (
-    <section id='reviews' className="relative py-24 bg-[#020617] overflow-hidden">
+    <section id='reviews' style={{backgroundColor: "rgba(2, 6, 23, 0.5)"}} className="relative py-24 overflow-hidden">
       {/* Background decoration to match your other sections */}
       <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-indigo-500/20 to-transparent" />
       

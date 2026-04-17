@@ -68,25 +68,25 @@ export default function Features() {
 
   // Manual Navigation Logic
   const handleNavigate = (direction) => {
-  if (!containerRef.current) return;
+    if (!containerRef.current) return;
 
-  const nextIndex =
-    direction === 'next'
-      ? Math.min(activeIndex + 1, FEATURES.length - 1)
-      : Math.max(activeIndex - 1, 0);
+    const nextIndex =
+      direction === "next"
+        ? Math.min(activeIndex + 1, FEATURES.length - 1)
+        : Math.max(activeIndex - 1, 0);
 
-  const containerHeight = containerRef.current.offsetHeight;
-  const viewportHeight = window.innerHeight;
-  const scrollableHeight = containerHeight - viewportHeight;
+    const containerHeight = containerRef.current.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const scrollableHeight = containerHeight - viewportHeight;
 
-  // +0.5 targets the CENTER of each step, avoiding boundary edge cases
-  const targetProgress = (nextIndex + 0.5) / FEATURES.length;
+    // +0.5 targets the CENTER of each step, avoiding boundary edge cases
+    const targetProgress = (nextIndex + 0.5) / FEATURES.length;
 
-  const scrollTarget =
-    containerRef.current.offsetTop + targetProgress * scrollableHeight;
+    const scrollTarget =
+      containerRef.current.offsetTop + targetProgress * scrollableHeight;
 
-  window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
-};
+    window.scrollTo({ top: scrollTarget, behavior: "smooth" });
+  };
 
   const cardWidth = 400;
   const x = useTransform(scrollYProgress, (value) => {
@@ -100,7 +100,11 @@ export default function Features() {
   const springX = useSpring(x, { stiffness: 120, damping: 20, mass: 0.5 });
 
   return (
-    <div id="features" className="bg-[#020617] min-h-screen font-sans selection:bg-indigo-500/30">
+    <div
+      id="features"
+      style={{ backgroundColor: "rgba(2, 6, 23, 1)" }}
+      className="min-h-screen font-sans"
+    >
       <section ref={containerRef} className="relative h-[450vh]">
         <div className="sticky top-0 h-screen flex flex-col justify-center items-center overflow-hidden">
           {/* Header UI (Existing) */}

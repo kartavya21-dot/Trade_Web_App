@@ -44,7 +44,7 @@ export default function PaymentSelector() {
     setActiveIndex((prev) => (prev - 1 + PAYMENTS.length) % PAYMENTS.length);
 
   return (
-    <section className="py-20 bg-[#020617] overflow-hidden flex flex-col items-center">
+    <section className="py-20 overflow-hidden flex flex-col items-center">
       <div className="text-center mb-16">
         <h1 className="text-white text-5xl font-extrabold mb-2">
           Flexible Payments

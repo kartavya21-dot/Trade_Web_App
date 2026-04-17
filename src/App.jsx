@@ -24,7 +24,8 @@ const MARKETS = [
 ];
 
 export default function KwikTrade() {
-  const [modalConfig, setModalConfig] = useState({isOpen: false, type: 'terms'});
+  const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'terms' });
+
   return (
     <div
       style={{
@@ -32,21 +33,44 @@ export default function KwikTrade() {
         background: "#060b18",
         color: "#fff",
         minHeight: "100vh",
+        position: "relative", // Needed for absolute children
       }}
     >
-      <Navbar />
-      {/* <Ticker markets={MARKETS} /> */}
-      <Hero markets={MARKETS} />
-      <Stats />
-      <Features />
-      <MarketTable />
-      <HowItWorks />
-      <PaymentSelector />
-      {/* <Faq /> */}
-      <Reviews />
-      <ContactForm/>
-      {/* <Cta /> */}
-      <Footer modalConfig={modalConfig} setModalConfig={setModalConfig}/>
+      {/* --- GLOBAL STATIC BACKGROUND GRID --- */}
+      <div
+        style={{
+          position: "fixed", // Key change: Fixed keeps it static during scroll
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none", // Ensures users can still click buttons/links
+          backgroundImage: `
+            linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          // Perspective effect
+          transform: "perspective(500px) rotateX(60deg) translateY(-100px)",
+          transformOrigin: "top",
+          // Fades the grid out toward the bottom
+          maskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
+        }}
+      />
+
+      {/* --- CONTENT LAYER --- */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <Navbar />
+        <Hero markets={MARKETS} />
+        <Stats />
+        <Features />
+        <MarketTable />
+        <HowItWorks />
+        <PaymentSelector />
+        <Reviews />
+        <ContactForm />
+        <Footer modalConfig={modalConfig} setModalConfig={setModalConfig} />
+      </div>
+
       <LegalModal 
         isOpen={modalConfig.isOpen} 
         type={modalConfig.type} 

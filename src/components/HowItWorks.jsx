@@ -1,20 +1,6 @@
 import React from "react";
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-export function ParallaxBackground() {
-  const { scrollY } = useScroll();
-  
-  // As user scrolls 0 -> 1000px, move the circle 0 -> 200px
-  const y1 = useTransform(scrollY, [0, 1000], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 1000], [0, -150]);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div style={{ y: y1 }} className="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full" />
-      <motion.div style={{ y: y2 }} className="absolute top-80 right-20 w-80 h-80 bg-cyan-500/10 blur-3xl rounded-full" />
-    </div>
-  );
-}
 const STEPS = [
   {
     num: "01",
@@ -41,13 +27,13 @@ const STEPS = [
 export default function HowItWorks() {
   return (
     <section
-      className="relative overflow-hidden bg-[#020617]"
-      style={{ padding: "120px 5%" }}
+      className="relative overflow-hidden"
+      style={{ padding: "120px 5%", backgroundColor: "rgba(2, 6, 23, 0.4)" }}
     >
       {/* Background Accents */}
       {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
       <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full" /> */}
-      <ParallaxBackground/>
+
       <div
         style={{
           maxWidth: 1100,

@@ -176,25 +176,10 @@ export default function MarketTable() {
         position: "relative",
         overflow: "hidden",
         padding: isMobile ? "48px 0" : "80px 0",
-        background: "#020617",
+        // backgroundColor: "#020617",
         minHeight: "40vh",
       }}
     >
-      {/* Background Decor */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.2,
-          backgroundImage: `linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-          maskImage:
-            "radial-gradient(ellipse at center, black, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at center, black, transparent 80%)",
-        }}
-      />
-
       {/* Header */}
       <div
         style={{
