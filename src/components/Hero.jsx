@@ -64,9 +64,10 @@ function HeroHeading() {
           background: "linear-gradient(135deg, #6366f1, #06b6d4)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
+          fontSize: "clamp(20px, 4vw, 34px)",
         }}
       >
-        Trade in <span style={{ fontStyle: "italic" }}>{displayText}</span>
+        Trade in {displayText}
         <motion.span
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 0.8 }}
