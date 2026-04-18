@@ -27,25 +27,22 @@ const markets = [
 ];
 
 const handleSubmit = (m) => {
-    
-    // 1. Configuration
-    const phoneNumber = "919876543210"; // REPLACE with your WhatsApp number (include country code, NO '+' or '-')
-    
-    // Constructing the body text
-    const message = (
-      `Hello,\n\nI am interested in starting my trading journey. I want info related to ${m.name}\n\n` +
-      `Please get in touch with me for onboarding.`
-    );
+  // 1. Configuration
+  const phoneNumber = "919876543210"; // REPLACE with your WhatsApp number (include country code, NO '+' or '-')
 
-    const encodedMessage = encodeURIComponent(message);
+  // Constructing the body text
+  const message =
+    `Hello,\n\nI am interested in starting my trading journey. I want info related to ${m.name}\n\n` +
+    `Please get in touch with me for onboarding.`;
 
-    // 4. Redirect to WhatsApp
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    
-    // Using window.open allows them to stay on your site while WhatsApp opens in a new tab
-    window.open(whatsappUrl, '_blank');
-  
-  };
+  const encodedMessage = encodeURIComponent(message);
+
+  // 4. Redirect to WhatsApp
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+  // Using window.open allows them to stay on your site while WhatsApp opens in a new tab
+  window.open(whatsappUrl, "_blank");
+};
 
 // Breakpoints
 const BP_MOBILE = 600;
@@ -89,6 +86,12 @@ function MarketCard({ market, isMobile, isTablet }) {
   };
 
   const tdStyle = (i) => ({
+    background:
+      hoveredRow === i
+        ? "rgba(99,102,241,0.05)"
+        : market[i].up
+          ? "rgba(74, 222, 128, 0.05)"
+          : "rgba(251, 113, 133, 0.05)",
     padding: isMobile ? "12px 12px" : isTablet ? "14px 14px" : "18px 20px",
     color: "white",
     fontWeight: 600,
@@ -150,7 +153,14 @@ function MarketCard({ market, isMobile, isTablet }) {
                   fontWeight: 400,
                 }}
               >
-                ₹ {m.price}
+                <motion.span
+                  key={m.price}
+                  initial={{ opacity: 0.5, y: 2 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  ₹ {m.price}
+                </motion.span>
               </td>
               <td
                 style={{
@@ -175,7 +185,57 @@ export default function MarketTable() {
 
   const cardWidth = isMobile ? width * 0.9 : isTablet ? 420 : 520;
   const gap = 20;
-  const duration = isMobile ? 20 : isTablet ? 30 : 40;
+  const duration = isMobile ? 20 : isTablet ? 90 : 40;
+
+  const [marketsData, setMarketsData] = useState(markets);
+
+  useEffect(() => {
+    // each stock gets its own trend memory
+    const trends = {};
+
+    const interval = setInterval(() => {
+      setMarketsData((prev) =>
+        prev.map((group, gi) =>
+          group.map((item, ii) => {
+            const key = `${gi}-${ii}`;
+
+            if (!trends[key]) {
+              trends[key] = {
+                direction: Math.random() > 0.5 ? 1 : -1,
+                strength: Math.random() * 0.3 + 0.1, // smoothness
+              };
+            }
+
+            // occasionally flip trend (like real market sentiment)
+            if (Math.random() < 0.1) {
+              trends[key].direction *= -1;
+            }
+
+            const basePrice = parseFloat(item.price.replace(/,/g, ""));
+
+            const movement =
+              trends[key].direction * (Math.random() * trends[key].strength);
+
+            const newPrice = basePrice * (1 + movement / 100);
+
+            const change = ((newPrice - basePrice) / basePrice) * 100;
+
+            return {
+              ...item,
+              price: newPrice.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }),
+              change: `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`,
+              up: change >= 0,
+            };
+          }),
+        ),
+      );
+    }, 2500); // every ~1.2 sec feels natural
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section
@@ -240,7 +300,7 @@ export default function MarketTable() {
           whileHover={{ animationPlayState: "paused" }}
           whileTap={{ animationPlayState: "paused" }} // Stops on touch for mobile
         >
-          {[...markets, ...markets].map((market, i) => (
+          {[...marketsData, ...marketsData].map((market, i) => (
             <div key={i} style={{ width: cardWidth, flexShrink: 0 }}>
               <MarketCard
                 market={market}
