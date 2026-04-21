@@ -6,7 +6,6 @@ import Features from "./components/Features.jsx";
 import MarketTable from "./components/MarketTable.jsx";
 import HowItWorks from "./components/HowItWorks.jsx";
 import Faq from "./components/Faq.jsx";
-import Cta from "./components/Cta.jsx";
 import Footer from "./components/Footer.jsx";
 import Reviews from "./components/Reviews.jsx";
 import ContactForm from "./components/ContactForm.jsx";

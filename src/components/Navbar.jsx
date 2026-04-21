@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from 'framer-motion';
-import ConnectButton from './ConnectButton.jsx'
-import AnimatedLogo from './AnimatedLogo.jsx'
-
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValueEvent,
+} from "framer-motion";
+import ConnectButton from "./ConnectButton.jsx";
+import AnimatedLogo from "./AnimatedLogo.jsx";
 
 /* ─── HELPERS ─── */
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < breakpoint : true
+    typeof window !== "undefined" ? window.innerWidth < breakpoint : true,
   );
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
@@ -32,8 +37,10 @@ export default function Navbar() {
     const handler = (e) => {
       // FIX: Check if the click is outside BOTH the drawer AND the burger button
       if (
-        drawerRef.current && !drawerRef.current.contains(e.target) &&
-        burgerRef.current && !burgerRef.current.contains(e.target)
+        drawerRef.current &&
+        !drawerRef.current.contains(e.target) &&
+        burgerRef.current &&
+        !burgerRef.current.contains(e.target)
       ) {
         setMenuOpen(false);
       }
@@ -45,7 +52,9 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
 
   return (
@@ -55,9 +64,9 @@ export default function Navbar() {
           position: sticky;
           top: 0;
           z-index: 100;
-          background: rgba(0, 0, 0, 0.4);
-          // background: rgba(15, 23, 42, 0.8);
-          backdrop-filter: blur(120px);
+          // background: rgba(0, 0, 0, 0.4);
+          background: rgba(7, 12, 21, 0.1);
+          backdrop-filter: blur(140px);
           border-bottom: 1px solid #1e2a45;
           padding: 1.2% 5%;
         }
@@ -136,11 +145,21 @@ export default function Navbar() {
         }
       `}</style>
 
-      <nav className="kwik-nav">
+      <nav
+        className="kwik-nav"
+        style={{
+          background:
+            "linear-gradient(89deg,rgba(82, 82, 217, 1) 7%, rgba(33, 21, 87, 0.91) 82%))",
+        }}
+      >
         <div className="kwik-nav-inner">
           <AnimatedLogo />
           <div className="kwik-links">
-            {NAV_LINKS.map(l => <a key={l} href={`#${l.toLowerCase()}`}>{l}</a>)}
+            {NAV_LINKS.map((l) => (
+              <a key={l} href={`#${l.toLowerCase()}`}>
+                {l}
+              </a>
+            ))}
           </div>
           <div className="kwik-connect-desktop">
             <ConnectButton />
@@ -150,15 +169,17 @@ export default function Navbar() {
             className={`kwik-burger${menuOpen ? " open" : ""}`}
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </nav>
 
       <div ref={drawerRef} className={`kwik-drawer ${menuOpen ? "open" : ""}`}>
         {NAV_LINKS.map((l, i) => (
-          <a 
-            key={l} 
+          <a
+            key={l}
             href={`#${l.toLowerCase()}`}
             className="kwik-drawer-link"
             style={{ transitionDelay: `${i * 100}ms` }}
@@ -167,8 +188,11 @@ export default function Navbar() {
             {l}
           </a>
         ))}
-        <div className="mt-10" style={{ opacity: menuOpen ? 1 : 0, transition: '0.5s 0.4s' }}>
-          <ConnectButton/>
+        <div
+          className="mt-10"
+          style={{ opacity: menuOpen ? 1 : 0, transition: "0.5s 0.4s" }}
+        >
+          <ConnectButton />
         </div>
       </div>
     </>

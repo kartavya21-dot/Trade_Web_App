@@ -65,6 +65,7 @@ function HeroHeading() {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           fontSize: "clamp(20px, 4vw, 34px)",
+          letterSpacing: "1px"
         }}
       >
         Trade in {displayText}
