@@ -12,19 +12,20 @@ import {
   MessageSquare, 
   TrendingUp 
 } from 'lucide-react';
+import { whyChooseContent } from '../content/whyChoose.js';
 
-const features = [
-  { icon: Wallet, text: "Get Started with small Amount" },
-  { icon: Headphones, text: "Dedicated RM Support*" },
-  { icon: UserPlus, text: "Register in 10Sec" },
-  { icon: MousePointerClick, text: "One-Click Options Trading" },
-  { icon: ArrowLeftRight, text: "Instant Withdrawal & Deposit" },
-  { icon: EyeOff, text: "No hidden fees" },
-  { icon: Percent, text: "Minimum Brokerage" },
-  { icon: MessageSquare, text: "Live Chat Support" },
-  { icon: Zap, text: "500X Margin" },
-  { icon: TrendingUp, text: "60X in carry forward" },
-];
+const ICON_MAP = {
+  Wallet,
+  UserPlus,
+  ArrowLeftRight,
+  Percent,
+  Zap,
+  Headphones,
+  MousePointerClick,
+  EyeOff,
+  MessageSquare,
+  TrendingUp
+};
 
 const FeatureCard = ({ icon: Icon, text, index }) => (
   <motion.div
@@ -56,7 +57,7 @@ const FeatureCard = ({ icon: Icon, text, index }) => (
       background: 'rgba(99, 102, 241, 0.15)', // Indigo glow
       color: '#6366f1' // Indigo-500
     }}>
-      <Icon size={20} />
+      {Icon && <Icon size={20} />}
     </div>
     <span style={{
       color: '#f1f5f9', // Slate-100
@@ -107,7 +108,7 @@ export default function WhyChoose() {
               marginBottom: '16px'
             }}
           >
-            Advantages
+            {whyChooseContent.badge}
           </motion.div>
           
           <h2 style={{
@@ -117,10 +118,10 @@ export default function WhyChoose() {
             marginBottom: '16px',
             letterSpacing: '-0.02em'
           }}>
-            Why Choose <span style={{ color: '#6366f1' }}>SuperTrade</span>
+            {whyChooseContent.headingPrefix}<span style={{ color: '#6366f1' }}>{whyChooseContent.headingHighlight}</span>
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>
-            Experience the next generation of trading with tools built for professional performance.
+            {whyChooseContent.description}
           </p>
         </div>
 
@@ -129,10 +130,10 @@ export default function WhyChoose() {
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '20px',
         }}>
-          {features.map((item, index) => (
+          {whyChooseContent.features.map((item, index) => (
             <FeatureCard 
               key={index} 
-              icon={item.icon} 
+              icon={ICON_MAP[item.iconId]} 
               text={item.text} 
               index={index} 
             />

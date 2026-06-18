@@ -8,33 +8,19 @@ import {
   QrCode,
   Smartphone,
 } from "lucide-react";
+import { paymentSelectorContent } from "../content/paymentSelector.js";
 
-const PAYMENTS = [
-  {
-    id: 0,
-    name: "UPI",
-    icon: <Smartphone />,
-    desc: "Instant transfer via phone",
-  },
-  {
-    id: 1,
-    name: "Credit/Debit Card",
-    icon: <CreditCard />,
-    desc: "Visa, Mastercard, Rupay",
-  },
-  {
-    id: 2,
-    name: "Bank Transfer",
-    icon: <Landmark />,
-    desc: "NEFT, RTGS, IMPS",
-  },
-  {
-    id: 3,
-    name: "QR Scanner",
-    icon: <QrCode />,
-    desc: "Scan and pay instantly",
-  },
-];
+const ICON_MAP = {
+  Smartphone: <Smartphone />,
+  CreditCard: <CreditCard />,
+  Landmark: <Landmark />,
+  QrCode: <QrCode />
+};
+
+const PAYMENTS = paymentSelectorContent.payments.map(payment => ({
+  ...payment,
+  icon: ICON_MAP[payment.iconId]
+}));
 
 export default function PaymentSelector() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -47,9 +33,9 @@ export default function PaymentSelector() {
     <section className="py-20 overflow-hidden flex flex-col items-center">
       <div className="text-center mb-16">
         <h1 className="text-white text-5xl font-extrabold mb-2">
-          Flexible Payments
+          {paymentSelectorContent.title}
         </h1>
-        <p className="text-slate-500">Choose your preferred funding method</p>
+        <p className="text-slate-500">{paymentSelectorContent.subtitle}</p>
       </div>
 
       {/* Main Container */}
@@ -111,7 +97,7 @@ export default function PaymentSelector() {
                     ${isActive ? "bg-indigo-500 text-white" : "bg-slate-800 text-slate-500"}
                   `}
                   >
-                    {React.cloneElement(payment.icon, { size: 28 })}
+                    {payment.icon && React.cloneElement(payment.icon, { size: 28 })}
                   </div>
 
                   <h3

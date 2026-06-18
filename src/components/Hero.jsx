@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { content } from "../assets/assets";
-
-const WORDS = ["Indian Commodities", "Indian Stocks", "Future & Options"];
+import { WORDS, heroContent } from "../content/hero.js";
 
 function HeroHeading() {
   const [index, setIndex] = useState(0);
@@ -45,7 +44,7 @@ function HeroHeading() {
         color: "#fff",
       }}
     >
-      Stock Trading With{" "}
+      {heroContent.heading.prefix}
       <span
         style={{
           background: "linear-gradient(135deg, #6366f1, #06b6d4)",
@@ -55,9 +54,9 @@ function HeroHeading() {
           width: "max-content",
         }}
       >
-        500x{" "}
+        {heroContent.heading.highlight}
       </span>{" "}
-      Margin
+      {heroContent.heading.suffix}
       <br />
       <span
         style={{
@@ -68,7 +67,7 @@ function HeroHeading() {
           letterSpacing: "1px"
         }}
       >
-        Trade in {displayText}
+        {heroContent.heading.typingPrefix}{displayText}
         <motion.span
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 0.8 }}
@@ -148,7 +147,7 @@ export default function Hero({ markets }) {
               boxShadow: "0 0 8px #6366f1",
             }}
           />
-          Build for Market Winners
+          {heroContent.badge}
         </div>
 
         <HeroHeading />
@@ -165,7 +164,7 @@ export default function Hero({ markets }) {
             letterSpacing: "-0.01em",
           }}
         >
-          Unlock Bigger Profits with the Lowest Brokerage
+          {heroContent.primarySubHeading}
         </p>
 
         {/* Secondary Description */}
@@ -178,8 +177,7 @@ export default function Hero({ markets }) {
             margin: "0 auto 32px",
           }}
         >
-          Passionate about making money? Take your trading to the next level
-          with a platform designed for simplicity, speed, and success.
+          {heroContent.secondaryDescription}
         </p>
 
         {/* Button */}
@@ -196,11 +194,11 @@ export default function Hero({ markets }) {
             whileTap={{ scale: 0.98 }}
             className="w-80 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all mt-4"
           >
-            Get in Touch
+            {heroContent.ctaButtonText}
           </motion.button>
         </div>
         <p style={{ fontSize: 13, color: "#445566", marginTop: 20 }}>
-          Apply in just 1 minute · No credit card required
+          {heroContent.noteText}
         </p>
       </div>
 
@@ -249,7 +247,7 @@ export default function Hero({ markets }) {
                 letterSpacing: "-0.04em",
               }}
             >
-              Get Higher Profits,
+              {heroContent.overlay.line1}
             </span>
 
             {/* Bottom Line with Contrast Font */}
@@ -264,7 +262,8 @@ export default function Hero({ markets }) {
                 textShadow: "0 2px 10px rgba(0,0,0,0.5)",
               }}
             >
-              at {/* --- HIGHLIGHTED PHRASE: DIFFERENT FONT --- */}
+              {heroContent.overlay.line2Prefix}
+              {/* --- HIGHLIGHTED PHRASE: DIFFERENT FONT --- */}
               <span
                 style={{
                   // Elegant Serif Font for highlighting
@@ -278,7 +277,7 @@ export default function Hero({ markets }) {
                   fontWeight: 400,
                 }}
               >
-                minimum Brokerage
+                {heroContent.overlay.line2Highlight}
               </span>
             </span>
           </div>

@@ -1,27 +1,7 @@
 import { useState } from "react";
+import { faqContent } from "../content/faq.js";
 
-const FAQS = [
-  {
-    q: "Is Kwik Trade really zero brokerage?",
-    a: "Yes! We offer zero brokerage trading with complete transparency. No hidden charges.",
-  },
-  {
-    q: "How secure is my data and money?",
-    a: "Your data is protected with bank-level 256-bit encryption and security measures.",
-  },
-  {
-    q: "What payment methods are supported?",
-    a: "We support UPI, bank transfer, NEFT, RTGS, and more.",
-  },
-  {
-    q: "Can I trade on mobile?",
-    a: "Yes, our platform is fully responsive and works seamlessly on all devices.",
-  },
-  {
-    q: "How quickly can I open an account?",
-    a: "Apply for a trading account in just 1 minute with our streamlined onboarding.",
-  },
-];
+const FAQS = faqContent.faqs;
 
 export default function Faq() {
   const [activeFaq, setActiveFaq] = useState(null);
@@ -37,7 +17,7 @@ export default function Faq() {
               margin: 0,
             }}
           >
-            Frequently asked questions
+            {faqContent.heading}
           </h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

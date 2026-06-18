@@ -1,4 +1,5 @@
 import AnimatedLogo from "./AnimatedLogo";
+import { footerContent } from "../content/footer.js";
 
 export default function Footer({modalConfig, setModalConfig}) {
   return (
@@ -41,14 +42,10 @@ export default function Footer({modalConfig, setModalConfig}) {
               margin: 0,
             }}
           >
-            Fast, reliable trading platform for global financial markets.
+            {footerContent.description}
           </p>
         </div>
-        {[
-          ["Product", ["Markets", "Features", "Pricing", "API"]],
-          ["Company", ["About", "Blog", "Careers", "Press"]],
-          ["Support", ["Help Center", "Contact", "Status", "Security"]],
-        ].map(([title, links]) => (
+        {footerContent.links.map(([title, links]) => (
           <div key={title}>
             <div
               style={{
@@ -89,16 +86,16 @@ export default function Footer({modalConfig, setModalConfig}) {
         }}
       >
         <span style={{ color: "#334455", fontSize: 12 }}>
-          © 2025 Superstock. All rights reserved.
+          {footerContent.copyright}
         </span>
         <div style={{ display: "flex", gap: 20 }}>
-          {["Privacy Policy", "Terms of Service"].map((l) => (
+          {footerContent.legalLinks.map((l) => (
             <a
-              key={l}
-              onClick={() => setModalConfig({ isOpen: true, type: `${l === "Terms of Service" ? 'terms' : 'privacy'}` })}
+              key={l.label}
+              onClick={() => setModalConfig({ isOpen: true, type: l.type })}
               style={{ color: "#334455", fontSize: 12, textDecoration: "none", cursor: "pointer" }}
             >
-              {l}
+              {l.label}
             </a>
           ))}
         </div>

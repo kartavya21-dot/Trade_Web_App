@@ -1,28 +1,8 @@
 import React from "react";
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { howItWorksContent } from "../content/howItWorks.js";
 
-const STEPS = [
-  {
-    num: "01",
-    title: "Create Account",
-    desc: "Sign up in under 1 minute with just your email and phone number.",
-  },
-  {
-    num: "02",
-    title: "Verify Identity",
-    desc: "Complete quick KYC verification to unlock full trading features.",
-  },
-  {
-    num: "03",
-    title: "Add Funds",
-    desc: "Deposit via UPI, bank transfer or other supported payment methods.",
-  },
-  {
-    num: "04",
-    title: "Start Trading",
-    desc: "Access global markets and start trading with advanced tools instantly.",
-  },
-];
+const STEPS = howItWorksContent.steps;
 
 export default function HowItWorks() {
   return (
@@ -59,7 +39,7 @@ export default function HowItWorks() {
               marginBottom: 12,
             }}
           >
-            Get Started
+            {howItWorksContent.badge}
           </div>
           <h2
             className="text-white"
@@ -70,7 +50,7 @@ export default function HowItWorks() {
               letterSpacing: "-0.02em",
             }}
           >
-            Start trading in 4 simple steps
+            {howItWorksContent.heading}
           </h2>
         </motion.div>
 

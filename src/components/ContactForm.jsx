@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { contactFormContent } from "../content/contactForm.js";
 
 export default function ContactForm() {
-  // 1. State to manage form data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,7 +23,7 @@ export default function ContactForm() {
       form.append("phone", formData.phone);
 
       await fetch(
-        "https://script.google.com/macros/s/AKfycbwv6qA2D__iUslNk8Q1-GascEzzD482NyGhmH5jIfMZkJjvHsRujUSKdHg2eZJAvBTl0A/exec",
+        contactFormContent.formActionUrl,
         {
           method: "POST",
           mode: "no-cors",
@@ -51,32 +51,6 @@ export default function ContactForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 2. Handler to redirect to email
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   // 1. Configuration
-  //   const phoneNumber = "919876543210"; // REPLACE with your WhatsApp number (include country code, NO '+' or '-')
-
-  //   // 2. Combine Subject and Body into one string
-  //   const message =
-  //     `*Trading Onboarding Request*\n` + // Asterisks make text BOLD in WhatsApp
-  //     `--------------------------\n` +
-  //     `*Name:* ${formData.name}\n` +
-  //     `*Email:* ${formData.email}\n` +
-  //     `*Contact:* ${formData.phone}\n\n` +
-  //     `_Please get in touch with me for onboarding._`;
-
-  //   // 3. Encode the message for a URL
-  //   const encodedMessage = encodeURIComponent(message);
-
-  //   // 4. Redirect to WhatsApp
-  //   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-
-  //   // Using window.open allows them to stay on your site while WhatsApp opens in a new tab
-  //   window.open(whatsappUrl, "_blank");
-  // };
-
   return (
     <section id="contact" className="relative py-24 overflow-hidden">
       {/* Background Glow */}
@@ -90,10 +64,10 @@ export default function ContactForm() {
           className="text-center mb-12"
         >
           <h2 className="text-white text-3xl md:text-4xl font-bold mb-4">
-            Ready to start trading?
+            {contactFormContent.heading}
           </h2>
           <p className="text-slate-400">
-            Fill out the form below and our team will get you onboarded.
+            {contactFormContent.subheading}
           </p>
         </motion.div>
 
@@ -107,7 +81,7 @@ export default function ContactForm() {
           {/* Name Field */}
           <div>
             <label className="block text-slate-400 text-sm font-medium mb-2 ml-1">
-              Full Name
+              {contactFormContent.labels.name}
             </label>
             <input
               required
@@ -115,7 +89,7 @@ export default function ContactForm() {
               value={formData.name}
               onChange={handleChange}
               type="text"
-              placeholder="Rahul Bhatt"
+              placeholder={contactFormContent.placeholders.name}
               className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-700"
             />
           </div>
@@ -123,7 +97,7 @@ export default function ContactForm() {
           {/* Email Field */}
           <div>
             <label className="block text-slate-400 text-sm font-medium mb-2 ml-1">
-              Email Address
+              {contactFormContent.labels.email}
             </label>
             <input
               required
@@ -131,7 +105,7 @@ export default function ContactForm() {
               value={formData.email}
               onChange={handleChange}
               type="email"
-              placeholder="rahulabhatt@example.com"
+              placeholder={contactFormContent.placeholders.email}
               className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-700"
             />
           </div>
@@ -139,7 +113,7 @@ export default function ContactForm() {
           {/* Contact Field */}
           <div>
             <label className="block text-slate-400 text-sm font-medium mb-2 ml-1">
-              Contact Number
+              {contactFormContent.labels.phone}
             </label>
             <input
               required
@@ -147,7 +121,7 @@ export default function ContactForm() {
               value={formData.phone}
               onChange={handleChange}
               type="tel"
-              placeholder="+91 98765 43210"
+              placeholder={contactFormContent.placeholders.phone}
               className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-700"
             />
           </div>
@@ -163,15 +137,15 @@ export default function ContactForm() {
             {isLoading ? (
               <div className="flex items-center justify-center gap-3">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Sending...</span>
+                <span>{contactFormContent.buttons.sending}</span>
               </div>
             ) : (
-              "Get in Touch"
+              contactFormContent.buttons.submit
             )}
           </motion.button>
 
           <p className="text-center text-slate-600 text-xs mt-4">
-            By clicking "Get in Touch" you agree to our Terms of Service.
+            {contactFormContent.disclaimer}
           </p>
         </motion.form>
       </div>
