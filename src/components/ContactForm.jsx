@@ -22,14 +22,11 @@ export default function ContactForm() {
       form.append("email", formData.email);
       form.append("phone", formData.phone);
 
-      await fetch(
-        contactFormContent.formActionUrl,
-        {
-          method: "POST",
-          mode: "no-cors",
-          body: form,
-        },
-      );
+      await fetch(contactFormContent.formActionUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: form,
+      });
 
       alert("Submitted successfully!");
 
@@ -48,7 +45,14 @@ export default function ContactForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "phone"
+          ? value.replace(/\D/g, "").slice(0, 10) // keep only digits
+          : value,
+    }));
   };
 
   return (
@@ -66,9 +70,7 @@ export default function ContactForm() {
           <h2 className="text-white text-3xl md:text-4xl font-bold mb-4">
             {contactFormContent.heading}
           </h2>
-          <p className="text-slate-400">
-            {contactFormContent.subheading}
-          </p>
+          <p className="text-slate-400">{contactFormContent.subheading}</p>
         </motion.div>
 
         <motion.form
@@ -121,6 +123,7 @@ export default function ContactForm() {
               value={formData.phone}
               onChange={handleChange}
               type="tel"
+              maxLength={10}
               placeholder={contactFormContent.placeholders.phone}
               className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-700"
             />

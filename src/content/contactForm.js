@@ -16,5 +16,5 @@ export const contactFormContent = {
     sending: "Sending..."
   },
   disclaimer: "By clicking \"Get in Touch\" you agree to our Terms of Service.",
-  formActionUrl: "https://script.google.com/macros/s/AKfycbwv6qA2D__iUslNk8Q1-GascEzzD482NyGhmH5jIfMZkJjvHsRujUSKdHg2eZJAvBTl0A/exec"
+  formActionUrl: "https://script.google.com/macros/s/AKfycby7Dw47JZodekA2Q_uHPuETZ94_VhJuQtQhItfgIMQo-sj0OuOPWH4bieL_Lc7akegnnQ/exec"
 };
