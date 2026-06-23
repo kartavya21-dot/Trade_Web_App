@@ -64,10 +64,11 @@ function HeroHeading() {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           fontSize: "clamp(20px, 4vw, 34px)",
-          letterSpacing: "1px"
+          letterSpacing: "1px",
         }}
       >
-        {heroContent.heading.typingPrefix}{displayText}
+        {heroContent.heading.typingPrefix}
+        {displayText}
         <motion.span
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 0.8 }}
@@ -189,13 +190,14 @@ export default function Hero({ markets }) {
             flexWrap: "wrap",
           }}
         >
-          <motion.button
+          <motion.a
+            href="#contact"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-80 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all mt-4"
           >
             {heroContent.ctaButtonText}
-          </motion.button>
+          </motion.a>
         </div>
         <p style={{ fontSize: 13, color: "#445566", marginTop: 20 }}>
           {heroContent.noteText}

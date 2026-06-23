@@ -10,12 +10,14 @@ import Footer from "./components/Footer.jsx";
 import Reviews from "./components/Reviews.jsx";
 import ContactForm from "./components/ContactForm.jsx";
 import LegalModal from "./components/LegalModal.jsx";
+import ContactModal from "./components/ContactModal.jsx"; // Import the new modal
 import { useScroll } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PaymentSelector from "./components/PaymentSelector.jsx";
 import WhyChoose from "./components/WhyChoose.jsx";
 
 const MARKETS = [
+  // ... (market data remains the same)
   { name: "NIFTY 50", price: "24,196.40", change: "+2.34%", up: true },
   { name: "SENSEX", price: "77,988.75", change: "+1.87%", up: true },
   { name: "BANK NIFTY", price: "56,086.30", change: "-0.92%", up: false },
@@ -24,7 +26,19 @@ const MARKETS = [
 ];
 
 export default function KwikTrade() {
-  const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'terms' });
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: "terms",
+  });
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Timer to open the contact modal after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContactModalOpen(true);
+    }, 3000);
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, []);
 
   return (
     <div
@@ -52,8 +66,10 @@ export default function KwikTrade() {
           transform: "perspective(500px) rotateX(60deg) translateY(-100px)",
           transformOrigin: "top",
           // Fades the grid out toward the bottom
-          maskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
+          maskImage:
+            "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
         }}
       />
 
@@ -61,7 +77,7 @@ export default function KwikTrade() {
       <div style={{ position: "relative", zIndex: 1 }}>
         <Navbar />
         <Hero markets={MARKETS} />
-        <WhyChoose/>
+        <WhyChoose />
         <Stats />
         <Features />
         <MarketTable />
@@ -72,10 +88,15 @@ export default function KwikTrade() {
         <Footer modalConfig={modalConfig} setModalConfig={setModalConfig} />
       </div>
 
-      <LegalModal 
-        isOpen={modalConfig.isOpen} 
-        type={modalConfig.type} 
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })} 
+      <LegalModal
+        isOpen={modalConfig.isOpen}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+      />
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 export const wp = () => {
-    window.location.href = "https://api.whatsapp.com/send/?phone=910000000000&text=Hello+I+am+interested+in+your+services"
+    window.location.href = "https://api.whatsapp.com/send/?phone=919661781584&text=Hello+I+am+interested+in+your+services+of+Supertrade.pro"
 }
 
 export const mail = (body) => {
