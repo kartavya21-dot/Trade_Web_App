@@ -15,6 +15,7 @@ import { useScroll } from "framer-motion";
 import { useState, useEffect } from "react";
 import PaymentSelector from "./components/PaymentSelector.jsx";
 import WhyChoose from "./components/WhyChoose.jsx";
+import VisitorChatWidget from "./components/VisitorChatWidget.jsx";
 
 const MARKETS = [
   // ... (market data remains the same)
@@ -72,6 +73,8 @@ export default function KwikTrade() {
             "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
         }}
       />
+
+      <VisitorChatWidget />
 
       {/* --- CONTENT LAYER --- */}
       <div style={{ position: "relative", zIndex: 1 }}>
