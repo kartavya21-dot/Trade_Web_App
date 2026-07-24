@@ -1,5 +1,6 @@
 // Admin API Configuration
-export const ADMIN_API_BASE_URL = import.meta.env.VITE_ADMIN_API_BASE_URL || "http://localhost:8000";
+// export const ADMIN_API_BASE_URL = import.meta.env.VITE_ADMIN_API_BASE_URL || "http://localhost:8000";
+export const ADMIN_API_BASE_URL = "https://hopeful-abundance-production-8087.up.railway.app";
 
 /**
  * Returns full URL for an admin API endpoint using ADMIN_API_BASE_URL.

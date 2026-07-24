@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const API_BASE_URL = "http://localhost:8000";
-const WS_BASE_URL = "ws://localhost:8000";
+const API_BASE_URL = "https://hopeful-abundance-production-8087.up.railway.app";
+const WS_BASE_URL = "ws://hopeful-abundance-production-8087.up.railway.app";
 
 export default function VisitorChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
