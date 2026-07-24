@@ -3,6 +3,30 @@ import React, { useState, useEffect, useRef } from "react";
 const API_BASE_URL = "https://hopeful-abundance-production-8087.up.railway.app";
 const WS_BASE_URL = "wss://hopeful-abundance-production-8087.up.railway.app";
 
+// Inline keyframe styles injected once
+const STYLE_ID = "visitor-chat-widget-animations";
+if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+    @keyframes vcw-pulse-dot {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes vcw-fade-in-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes vcw-delivered-flash {
+      0%   { color: #22c55e; }
+      100% { color: #71717a; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+let pendingIdCounter = 0;
+
 export default function VisitorChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [conversationId, setConversationId] = useState(
@@ -25,6 +49,8 @@ export default function VisitorChatWidget() {
   );
 
   const [messages, setMessages] = useState([]);
+  const [pendingMessages, setPendingMessages] = useState([]); // optimistic messages waiting for ack
+  const [deliveredIds, setDeliveredIds] = useState(new Set()); // recently delivered pending IDs (for checkmark flash)
   const [inputText, setInputText] = useState("");
   const [agentName, setAgentName] = useState(null);
   const [chatStatus, setChatStatus] = useState("DISCONNECTED"); // DISCONNECTED, CONNECTING, WAITING, ACTIVE, CLOSED
@@ -37,7 +63,7 @@ export default function VisitorChatWidget() {
   // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isOpen, hasSubmittedForm]);
+  }, [messages, pendingMessages, isOpen, hasSubmittedForm]);
 
   const resetVisitorSession = () => {
     localStorage.removeItem("visitor_conversation_id");
@@ -52,6 +78,8 @@ export default function VisitorChatWidget() {
     setVisitorPhone("");
     setHasSubmittedForm(false);
     setMessages([]);
+    setPendingMessages([]);
+    setDeliveredIds(new Set());
     setAgentName(null);
     setChatStatus("DISCONNECTED");
     if (wsRef.current) {
@@ -68,6 +96,10 @@ export default function VisitorChatWidget() {
       if (res.ok) {
         const history = await res.json();
         setMessages(history);
+        // Clear any pending messages that now appear in history
+        setPendingMessages((prev) =>
+          prev.filter((p) => !history.some((m) => m.message === p.message))
+        );
       } else if (res.status === 404 || res.status === 401 || res.status === 403) {
         // Conversation was deleted or visitor UUID is invalid — reset session to Pre-Chat Form
         resetVisitorSession();
@@ -135,10 +167,38 @@ export default function VisitorChatWidget() {
       const data = JSON.parse(event.data);
 
       if (data.type === "message") {
+        const incomingMsg = data.message;
+
         setMessages((prev) => {
-          if (prev.some((m) => m.id === data.message.id)) return prev;
-          return [...prev, data.message];
+          if (prev.some((m) => m.id === incomingMsg.id)) return prev;
+          return [...prev, incomingMsg];
         });
+
+        // If this is our own message echoed back, resolve the matching pending message
+        if (incomingMsg.sender_type === "VISITOR") {
+          setPendingMessages((prev) => {
+            const matchIdx = prev.findIndex((p) => p.message === incomingMsg.message);
+            if (matchIdx !== -1) {
+              const matched = prev[matchIdx];
+              // Trigger a brief "delivered" flash
+              setDeliveredIds((ds) => {
+                const next = new Set(ds);
+                next.add(matched._pendingId);
+                return next;
+              });
+              // Remove the flash after 1.5s
+              setTimeout(() => {
+                setDeliveredIds((ds) => {
+                  const next = new Set(ds);
+                  next.delete(matched._pendingId);
+                  return next;
+                });
+              }, 1500);
+              return prev.filter((_, i) => i !== matchIdx);
+            }
+            return prev;
+          });
+        }
       } else if (data.type === "agent_assigned") {
         setAgentName(data.assigned_employee_name);
         setChatStatus("ACTIVE");
@@ -166,7 +226,7 @@ export default function VisitorChatWidget() {
     }
   };
 
-  // 4. Send Message over WebSocket
+  // 4. Send Message over WebSocket — now with optimistic pending
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
@@ -176,9 +236,23 @@ export default function VisitorChatWidget() {
       return;
     }
 
+    const text = inputText.trim();
+
+    // Create an optimistic pending message
+    const pendingMsg = {
+      _pendingId: `pending-${++pendingIdCounter}`,
+      message: text,
+      sender_type: "VISITOR",
+      sender_name: visitorName || "You",
+      created_at: new Date().toISOString(),
+      _status: "sending",
+    };
+
+    setPendingMessages((prev) => [...prev, pendingMsg]);
+
     wsRef.current.send(
       JSON.stringify({
-        message: inputText.trim(),
+        message: text,
       })
     );
     setInputText("");
@@ -217,6 +291,51 @@ export default function VisitorChatWidget() {
       return "";
     }
   };
+
+  // ── Sending indicator (3 pulsing dots) ──
+  const SendingDots = () => (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+      <span style={{ fontSize: 11, color: "#a1a1aa" }}>Sending</span>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          style={{
+            width: 4,
+            height: 4,
+            borderRadius: "50%",
+            backgroundColor: "#a1a1aa",
+            display: "inline-block",
+            animation: `vcw-pulse-dot 1.2s ease-in-out ${i * 0.2}s infinite`,
+          }}
+        />
+      ))}
+    </span>
+  );
+
+  // ── Delivered checkmark with flash ──
+  const DeliveredCheck = () => (
+    <span
+      style={{
+        fontSize: 11,
+        animation: "vcw-delivered-flash 1.5s ease forwards",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 3,
+      }}
+    >
+      Delivered ✓
+    </span>
+  );
+
+  // Merge confirmed messages + pending messages for display
+  const allDisplayMessages = [
+    ...messages.map((m) => ({ ...m, _type: "confirmed" })),
+    ...pendingMessages.map((p) => ({
+      ...p,
+      _type: "pending",
+      _isDelivered: deliveredIds.has(p._pendingId),
+    })),
+  ];
 
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 99999, fontFamily: "sans-serif" }}>
@@ -520,41 +639,51 @@ export default function VisitorChatWidget() {
             /* Screen B: Active Chat Messages Interface */
             <>
               <div style={{ flex: 1, padding: 16, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
-                {messages.length === 0 ? (
+                {allDisplayMessages.length === 0 ? (
                   <div style={{ textAlign: "center", color: "#71717a", fontSize: 12, marginTop: 40 }}>
                     👋 Welcome <strong>{visitorName || "there"}</strong>! Type a message below to chat with our support team.
                   </div>
                 ) : (
-                  messages.map((msg) => {
+                  allDisplayMessages.map((msg) => {
                     const isVisitor = msg.sender_type === "VISITOR";
+                    const isPending = msg._type === "pending";
+                    const isDelivered = msg._isDelivered;
+
                     return (
                       <div
-                        key={msg.id}
+                        key={msg.id || msg._pendingId}
                         style={{
                           alignSelf: isVisitor ? "flex-end" : "flex-start",
                           maxWidth: "80%",
                           display: "flex",
                           flexDirection: "column",
                           alignItems: isVisitor ? "flex-end" : "flex-start",
+                          animation: isPending ? "vcw-fade-in-up 0.25s ease" : undefined,
                         }}
                       >
                         <div
                           style={{
-                            // backgroundColor: isVisitor ? "#0d9488" : "#27272a",
-                            // color: isVisitor ? "#ffffff" : "#e4e4e7",
                             padding: "10px 14px",
                             borderRadius: isVisitor ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
                             fontSize: 13,
                             lineHeight: 1.4,
                             border: isVisitor ? "none" : "1px solid #3f3f46",
                             wordBreak: "break-word",
+                            opacity: isPending && !isDelivered ? 0.7 : 1,
+                            transition: "opacity 0.3s ease",
                           }}
                           className={`${isVisitor ? "bg-gradient-to-r from-indigo-600 to-indigo-500" : "bg-[#27272a"}`}
                         >
                           {msg.message}
                         </div>
-                        <div style={{ fontSize: 9, color: "#71717a", marginTop: 4, padding: "0 2px" }}>
-                          {msg.sender_name || (isVisitor ? "You" : "Agent")} • {formatTime(msg.created_at)}
+                        <div style={{ fontSize: 9, color: "#71717a", marginTop: 4, padding: "0 2px", display: "flex", alignItems: "center", gap: 4 }}>
+                          {isPending ? (
+                            isDelivered ? <DeliveredCheck /> : <SendingDots />
+                          ) : (
+                            <>
+                              {msg.sender_name || (isVisitor ? "You" : "Agent")} • {formatTime(msg.created_at)}
+                            </>
+                          )}
                         </div>
                       </div>
                     );
