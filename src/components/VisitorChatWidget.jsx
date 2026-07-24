@@ -21,6 +21,10 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
       0%   { color: #22c55e; }
       100% { color: #71717a; }
     }
+    @keyframes vcw-typing-bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -56,14 +60,60 @@ export default function VisitorChatWidget() {
   const [chatStatus, setChatStatus] = useState("DISCONNECTED"); // DISCONNECTED, CONNECTING, WAITING, ACTIVE, CLOSED
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const [awaitingReply, setAwaitingReply] = useState(false); // true when visitor sent a msg and no agent reply yet
 
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const replyTimerRef = useRef(null); // 30s auto-message timer
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, pendingMessages, isOpen, hasSubmittedForm]);
+  }, [messages, pendingMessages, isOpen, hasSubmittedForm, showTypingIndicator]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
+    };
+  }, []);
+
+  // ── Start fake typing indicator + 30s auto-message timer ──
+  const startReplyTimer = () => {
+    // Clear any existing timer
+    if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
+
+    setShowTypingIndicator(true);
+    setAwaitingReply(true);
+
+    replyTimerRef.current = setTimeout(() => {
+      setShowTypingIndicator(false);
+      setAwaitingReply(false);
+      replyTimerRef.current = null;
+
+      // Inject a local system message (not sent to backend)
+      const systemMsg = {
+        id: `system-${Date.now()}`,
+        message: "Our support team is currently busy. We'll get back to you shortly — thanks for your patience! 🙏",
+        sender_type: "SYSTEM",
+        sender_name: "TradeAdmin Support",
+        created_at: new Date().toISOString(),
+        _isSystem: true,
+      };
+      setMessages((prev) => [...prev, systemMsg]);
+    }, 30000);
+  };
+
+  // ── Cancel the timer (agent replied) ──
+  const cancelReplyTimer = () => {
+    if (replyTimerRef.current) {
+      clearTimeout(replyTimerRef.current);
+      replyTimerRef.current = null;
+    }
+    setShowTypingIndicator(false);
+    setAwaitingReply(false);
+  };
 
   const resetVisitorSession = () => {
     localStorage.removeItem("visitor_conversation_id");
@@ -82,6 +132,12 @@ export default function VisitorChatWidget() {
     setDeliveredIds(new Set());
     setAgentName(null);
     setChatStatus("DISCONNECTED");
+    setShowTypingIndicator(false);
+    setAwaitingReply(false);
+    if (replyTimerRef.current) {
+      clearTimeout(replyTimerRef.current);
+      replyTimerRef.current = null;
+    }
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
@@ -174,6 +230,11 @@ export default function VisitorChatWidget() {
           return [...prev, incomingMsg];
         });
 
+        // If this is an agent message, cancel the reply timer (they responded)
+        if (incomingMsg.sender_type === "EMPLOYEE" || incomingMsg.sender_type === "AGENT") {
+          cancelReplyTimer();
+        }
+
         // If this is our own message echoed back, resolve the matching pending message
         if (incomingMsg.sender_type === "VISITOR") {
           setPendingMessages((prev) => {
@@ -256,6 +317,9 @@ export default function VisitorChatWidget() {
       })
     );
     setInputText("");
+
+    // Start the fake typing indicator + 30s auto-message timer
+    startReplyTimer();
   };
 
   // 5. Update Profile mid-chat
@@ -327,9 +391,52 @@ export default function VisitorChatWidget() {
     </span>
   );
 
+  // ── Typing indicator bubble (3 bouncing dots) ──
+  const TypingIndicator = () => (
+    <div
+      style={{
+        alignSelf: "flex-start",
+        maxWidth: "80%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        animation: "vcw-fade-in-up 0.25s ease",
+      }}
+    >
+      <div
+        style={{
+          padding: "10px 18px",
+          borderRadius: "16px 16px 16px 2px",
+          backgroundColor: "#27272a",
+          border: "1px solid #3f3f46",
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+        }}
+      >
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: "50%",
+              backgroundColor: "#a1a1aa",
+              display: "inline-block",
+              animation: `vcw-typing-bounce 1.2s ease-in-out ${i * 0.15}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+      <div style={{ fontSize: 9, color: "#71717a", marginTop: 4, padding: "0 2px" }}>
+        {agentName || "Agent"} is typing...
+      </div>
+    </div>
+  );
+
   // Merge confirmed messages + pending messages for display
   const allDisplayMessages = [
-    ...messages.map((m) => ({ ...m, _type: "confirmed" })),
+    ...messages.map((m) => ({ ...m, _type: m._isSystem ? "system" : "confirmed" })),
     ...pendingMessages.map((p) => ({
       ...p,
       _type: "pending",
@@ -646,8 +753,41 @@ export default function VisitorChatWidget() {
                 ) : (
                   allDisplayMessages.map((msg) => {
                     const isVisitor = msg.sender_type === "VISITOR";
+                    const isSystem = msg._type === "system";
                     const isPending = msg._type === "pending";
                     const isDelivered = msg._isDelivered;
+
+                    // System messages get a distinct centered style
+                    if (isSystem) {
+                      return (
+                        <div
+                          key={msg.id}
+                          style={{
+                            alignSelf: "center",
+                            maxWidth: "90%",
+                            animation: "vcw-fade-in-up 0.3s ease",
+                          }}
+                        >
+                          <div
+                            style={{
+                              padding: "10px 16px",
+                              borderRadius: 12,
+                              fontSize: 12,
+                              lineHeight: 1.5,
+                              color: "#e4e4e7",
+                              backgroundColor: "#1e293b",
+                              border: "1px solid #334155",
+                              textAlign: "center",
+                            }}
+                          >
+                            {msg.message}
+                          </div>
+                          <div style={{ fontSize: 9, color: "#64748b", marginTop: 4, textAlign: "center" }}>
+                            {formatTime(msg.created_at)}
+                          </div>
+                        </div>
+                      );
+                    }
 
                     return (
                       <div
@@ -689,6 +829,8 @@ export default function VisitorChatWidget() {
                     );
                   })
                 )}
+                {/* Typing indicator — shown after visitor sends, hidden on agent reply or 30s timeout */}
+                {showTypingIndicator && <TypingIndicator />}
                 <div ref={messagesEndRef} />
               </div>
 
