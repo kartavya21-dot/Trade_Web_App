@@ -241,6 +241,15 @@ const CALLOUT_MESSAGES = [
   "I am here to help you! 😊",
 ];
 
+const WELCOME_MESSAGE = {
+  id: "welcome-system-msg",
+  message: "Hi there! 👋 How can we help you today? Feel free to ask anything!",
+  sender_type: "AGENT",
+  sender_name: "TradeAdmin Support",
+  created_at: new Date().toISOString(),
+  _isWelcome: true,
+};
+
 let pendingIdCounter = 0;
 
 export default function VisitorChatWidget() {
@@ -260,9 +269,6 @@ export default function VisitorChatWidget() {
   const [visitorPhone, setVisitorPhone] = useState(
     () => localStorage.getItem("visitor_phone") || ""
   );
-  const [hasSubmittedForm, setHasSubmittedForm] = useState(
-    () => !!localStorage.getItem("visitor_conversation_id")
-  );
 
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState([]); // optimistic messages waiting for ack
@@ -271,7 +277,6 @@ export default function VisitorChatWidget() {
   const [agentName, setAgentName] = useState(null);
   const [chatStatus, setChatStatus] = useState("DISCONNECTED"); // DISCONNECTED, CONNECTING, WAITING, ACTIVE, CLOSED
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [awaitingReply, setAwaitingReply] = useState(false); // true when visitor sent a msg and no agent reply yet
   const [calloutIndex, setCalloutIndex] = useState(0);
@@ -286,7 +291,7 @@ export default function VisitorChatWidget() {
   // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, pendingMessages, isOpen, hasSubmittedForm, showTypingIndicator]);
+  }, [messages, pendingMessages, isOpen, showTypingIndicator]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -359,7 +364,6 @@ export default function VisitorChatWidget() {
     setVisitorName("");
     setVisitorEmail("");
     setVisitorPhone("");
-    setHasSubmittedForm(false);
     setMessages([]);
     setPendingMessages([]);
     setDeliveredIds(new Set());
@@ -390,7 +394,7 @@ export default function VisitorChatWidget() {
           prev.filter((p) => !history.some((m) => m.message === p.message))
         );
       } else if (res.status === 404 || res.status === 401 || res.status === 403) {
-        // Conversation was deleted or visitor UUID is invalid — reset session to Pre-Chat Form
+        // Conversation was deleted or visitor UUID is invalid — reset session
         resetVisitorSession();
       }
     } catch (err) {
@@ -398,13 +402,9 @@ export default function VisitorChatWidget() {
     }
   };
 
-  // 2. Start new chat session with visitor details
-  const handleStartChatSession = async (e) => {
-    if (e) e.preventDefault();
-    if (!visitorName.trim() || !visitorEmail.trim()) return;
-
+  // 2. Start or resume chat session directly without upfront forms
+  const startChatSession = async () => {
     try {
-      setIsSubmittingForm(true);
       setChatStatus("CONNECTING");
 
       const res = await fetch(`${API_BASE_URL}/chat/start`, {
@@ -412,8 +412,8 @@ export default function VisitorChatWidget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uuid: visitorUuid || undefined,
-          name: visitorName.trim(),
-          email: visitorEmail.trim(),
+          name: visitorName.trim() || undefined,
+          email: visitorEmail.trim() || undefined,
           phone: visitorPhone.trim() || undefined,
         }),
       });
@@ -423,27 +423,23 @@ export default function VisitorChatWidget() {
       const data = await res.json();
       setConversationId(data.conversation_id);
       setVisitorUuid(data.visitor_uuid);
-      setHasSubmittedForm(true);
 
       // Persist visitor details and session in localStorage
       localStorage.setItem("visitor_conversation_id", data.conversation_id);
       localStorage.setItem("visitor_uuid", data.visitor_uuid);
-      localStorage.setItem("visitor_name", visitorName.trim());
-      localStorage.setItem("visitor_email", visitorEmail.trim());
-      if (visitorPhone.trim()) localStorage.setItem("visitor_phone", visitorPhone.trim());
 
       await fetchHistory(data.conversation_id, data.visitor_uuid);
+      return data.conversation_id;
     } catch (err) {
-      console.error("Pre-chat submission error:", err);
+      console.error("Direct chat session start error:", err);
       setChatStatus("DISCONNECTED");
-    } finally {
-      setIsSubmittingForm(false);
+      return null;
     }
   };
 
   // 3. Connect WebSocket when conversationId is available
   useEffect(() => {
-    if (!conversationId || !hasSubmittedForm) return;
+    if (!conversationId) return;
 
     const ws = new WebSocket(`${WS_BASE_URL}/ws/visitor/${conversationId}`);
     wsRef.current = ws;
@@ -497,7 +493,7 @@ export default function VisitorChatWidget() {
         setAgentName(data.assigned_employee_name);
         setChatStatus("ACTIVE");
       } else if (data.type === "conversation_deleted") {
-        // Agent or Admin deleted the chat — reset session to Pre-Chat Form so visitor can start a new chat
+        // Agent or Admin deleted the chat — reset session so visitor can start fresh
         resetVisitorSession();
       }
     };
@@ -509,51 +505,50 @@ export default function VisitorChatWidget() {
     return () => {
       if (ws) ws.close();
     };
-  }, [conversationId, hasSubmittedForm]);
+  }, [conversationId]);
 
-  // Handle open widget
+  // Handle open widget (Instant Connect on click)
   const handleToggleWidget = () => {
     const nextOpen = !isOpen;
     setIsOpen(nextOpen);
     setHasInteracted(true);
     if (nextOpen) {
       setShowCallout(false);
-      if (conversationId && hasSubmittedForm) {
+      if (conversationId && visitorUuid) {
         fetchHistory(conversationId, visitorUuid);
+      } else {
+        startChatSession();
       }
     }
   };
 
-  // 4. Send Message over WebSocket — now with optimistic pending
-  const handleSendMessage = (e) => {
+  // 4. Send Message over WebSocket — with optimistic pending and auto-connect
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
-
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      handleStartChatSession();
-      return;
-    }
-
     const text = inputText.trim();
+    if (!text) return;
 
     // Create an optimistic pending message
     const pendingMsg = {
       _pendingId: `pending-${++pendingIdCounter}`,
       message: text,
       sender_type: "VISITOR",
-      sender_name: visitorName || "You",
+      sender_name: "You",
       created_at: new Date().toISOString(),
       _status: "sending",
     };
 
     setPendingMessages((prev) => [...prev, pendingMsg]);
-
-    wsRef.current.send(
-      JSON.stringify({
-        message: text,
-      })
-    );
     setInputText("");
+
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ message: text }));
+    } else {
+      const activeConvId = conversationId || (await startChatSession());
+      if (activeConvId && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ message: text }));
+      }
+    }
 
     // Start the fake typing indicator + 30s auto-message timer
     startReplyTimer();
@@ -671,8 +666,9 @@ export default function VisitorChatWidget() {
     </div>
   );
 
-  // Merge confirmed messages + pending messages for display
+  // Merge welcome message (if no history), confirmed messages + pending messages for display
   const allDisplayMessages = [
+    ...(messages.length === 0 ? [WELCOME_MESSAGE] : []),
     ...messages.map((m) => ({ ...m, _type: m._isSystem ? "system" : "confirmed" })),
     ...pendingMessages.map((p) => ({
       ...p,
@@ -943,30 +939,28 @@ export default function VisitorChatWidget() {
                     }}
                   />
                   <small style={{ color: "#a1a1aa", fontSize: 11 }}>
-                    {!hasSubmittedForm
-                      ? "Pre-Chat Registration"
-                      : chatStatus === "ACTIVE"
+                    {chatStatus === "ACTIVE"
                       ? `Connected with ${agentName || "Agent"}`
                       : chatStatus === "WAITING"
                       ? "Waiting for an available agent..."
                       : chatStatus === "CLOSED"
                       ? "Conversation closed"
-                      : "Connecting..."}
+                      : chatStatus === "CONNECTING"
+                      ? "Connecting to support..."
+                      : "Support Online"}
                   </small>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 8 }}>
-              {hasSubmittedForm && (
-                <button
-                  onClick={() => setShowProfileModal(!showProfileModal)}
-                  style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: 16 }}
-                  title="Edit profile details"
-                >
-                  ⚙️
-                </button>
-              )}
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button
+                onClick={() => setShowProfileModal(!showProfileModal)}
+                style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: 16 }}
+                title="Your contact details (optional)"
+              >
+                ⚙️
+              </button>
               <button
                 onClick={() => setIsOpen(false)}
                 style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: 18 }}
@@ -977,8 +971,8 @@ export default function VisitorChatWidget() {
             </div>
           </div>
 
-          {/* Profile Edit Overlay Modal (For active sessions) */}
-          {showProfileModal && hasSubmittedForm && (
+          {/* Profile Edit Overlay Modal (Optional contact details) */}
+          {showProfileModal && (
             <form
               onSubmit={handleSaveProfile}
               style={{
@@ -990,10 +984,25 @@ export default function VisitorChatWidget() {
                 gap: 10,
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: "bold", color: "#2dd4bf" }}>Update Info</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontSize: 12, fontWeight: "bold", color: "#2dd4bf" }}>
+                  Your Contact Details (Optional)
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(false)}
+                  style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: 14 }}
+                  title="Close"
+                >
+                  ✕
+                </button>
+              </div>
+              <p style={{ margin: 0, fontSize: 11, color: "#a1a1aa", lineHeight: 1.4 }}>
+                Leave your info so our support team can follow up with you if you leave the chat.
+              </p>
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder="Your Name (Optional)"
                 value={visitorName}
                 onChange={(e) => setVisitorName(e.target.value)}
                 style={{
@@ -1003,11 +1012,12 @@ export default function VisitorChatWidget() {
                   color: "#fff",
                   borderRadius: 8,
                   fontSize: 12,
+                  outline: "none",
                 }}
               />
               <input
                 type="email"
-                placeholder="Your Email"
+                placeholder="Your Email (Optional)"
                 value={visitorEmail}
                 onChange={(e) => setVisitorEmail(e.target.value)}
                 style={{
@@ -1017,12 +1027,28 @@ export default function VisitorChatWidget() {
                   color: "#fff",
                   borderRadius: 8,
                   fontSize: 12,
+                  outline: "none",
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number (Optional)"
+                value={visitorPhone}
+                onChange={(e) => setVisitorPhone(e.target.value)}
+                style={{
+                  padding: "8px 10px",
+                  backgroundColor: "#18181b",
+                  border: "1px solid #3f3f46",
+                  color: "#fff",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  outline: "none",
                 }}
               />
               <button
                 type="submit"
                 style={{
-                  padding: "6px 12px",
+                  padding: "7px 12px",
                   backgroundColor: "#0d9488",
                   color: "#fff",
                   border: "none",
@@ -1037,261 +1063,140 @@ export default function VisitorChatWidget() {
             </form>
           )}
 
-          {/* Screen A: Pre-Chat Registration Form (If details not provided yet) */}
-          {!hasSubmittedForm ? (
-            <form
-              onSubmit={handleStartChatSession}
-              style={{
-                flex: 1,
-                padding: 24,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                gap: 16,
-                backgroundColor: "#18181b",
-              }}
-            >
-              <div style={{ textAlign: "center", marginBottom: 8 }}>
-                <h3 style={{ margin: "0 0 6px 0", fontSize: 16, color: "#ffffff" }}>👋 Welcome to Support</h3>
-                <p style={{ margin: 0, fontSize: 12, color: "#a1a1aa", lineHeight: 1.4 }}>
-                  Please fill in your details below so our support team can assist you right away.
-                </p>
-              </div>
+          {/* Active Chat Messages Interface */}
+          <div style={{ flex: 1, padding: 16, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
+            {allDisplayMessages.map((msg) => {
+              const isVisitor = msg.sender_type === "VISITOR";
+              const isSystem = msg._type === "system";
+              const isPending = msg._type === "pending";
+              const isDelivered = msg._isDelivered;
 
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: "bold", color: "#a1a1aa", marginBottom: 6 }}>
-                  FULL NAME <span style={{ color: "#ef4444" }}>*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Jane Doe"
-                  value={visitorName}
-                  onChange={(e) => setVisitorName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    padding: "10px 14px",
-                    backgroundColor: "#27272a",
-                    border: "1px solid #3f3f46",
-                    color: "#ffffff",
-                    borderRadius: 10,
-                    fontSize: 13,
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: "bold", color: "#a1a1aa", marginBottom: 6 }}>
-                  EMAIL ADDRESS <span style={{ color: "#ef4444" }}>*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="e.g. jane@example.com"
-                  value={visitorEmail}
-                  onChange={(e) => setVisitorEmail(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    padding: "10px 14px",
-                    backgroundColor: "#27272a",
-                    border: "1px solid #3f3f46",
-                    color: "#ffffff",
-                    borderRadius: 10,
-                    fontSize: 13,
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: "bold", color: "#a1a1aa", marginBottom: 6 }}>
-                  PHONE NUMBER <span style={{ color: "#71717a", fontWeight: "normal" }}>(Optional)</span>
-                </label>
-                <input
-                  type="tel"
-                  placeholder="e.g. +1 555-0199"
-                  value={visitorPhone}
-                  onChange={(e) => setVisitorPhone(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    padding: "10px 14px",
-                    backgroundColor: "#27272a",
-                    border: "1px solid #3f3f46",
-                    color: "#ffffff",
-                    borderRadius: 10,
-                    fontSize: 13,
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmittingForm || !visitorName.trim() || !visitorEmail.trim()}
-                style={{
-                  marginTop: 8,
-                  padding: "12px 16px",
-                  backgroundColor: !visitorName.trim() || !visitorEmail.trim() ? "#3f3f46" : "#0d9488",
-                  color: !visitorName.trim() || !visitorEmail.trim() ? "#71717a" : "#ffffff",
-                  border: "none",
-                  borderRadius: 10,
-                  cursor: !visitorName.trim() || !visitorEmail.trim() ? "not-allowed" : "pointer",
-                  fontWeight: "bold",
-                  fontSize: 14,
-                  transition: "background-color 0.2s ease",
-                }}
-              >
-                {isSubmittingForm ? "Connecting..." : "Start Chatting →"}
-              </button>
-            </form>
-          ) : (
-            /* Screen B: Active Chat Messages Interface */
-            <>
-              <div style={{ flex: 1, padding: 16, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
-                {allDisplayMessages.length === 0 ? (
-                  <div style={{ textAlign: "center", color: "#71717a", fontSize: 12, marginTop: 40 }}>
-                    👋 Welcome <strong>{visitorName || "there"}</strong>! Type a message below to chat with our support team.
+              // System messages get a distinct centered style
+              if (isSystem) {
+                return (
+                  <div
+                    key={msg.id}
+                    style={{
+                      alignSelf: "center",
+                      maxWidth: "90%",
+                      animation: "vcw-fade-in-up 0.3s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "10px 16px",
+                        borderRadius: 12,
+                        fontSize: 12,
+                        lineHeight: 1.5,
+                        color: "#e4e4e7",
+                        backgroundColor: "#1e293b",
+                        border: "1px solid #334155",
+                        textAlign: "center",
+                      }}
+                    >
+                      {msg.message}
+                    </div>
+                    <div style={{ fontSize: 9, color: "#64748b", marginTop: 4, textAlign: "center" }}>
+                      {formatTime(msg.created_at)}
+                    </div>
                   </div>
-                ) : (
-                  allDisplayMessages.map((msg) => {
-                    const isVisitor = msg.sender_type === "VISITOR";
-                    const isSystem = msg._type === "system";
-                    const isPending = msg._type === "pending";
-                    const isDelivered = msg._isDelivered;
+                );
+              }
 
-                    // System messages get a distinct centered style
-                    if (isSystem) {
-                      return (
-                        <div
-                          key={msg.id}
-                          style={{
-                            alignSelf: "center",
-                            maxWidth: "90%",
-                            animation: "vcw-fade-in-up 0.3s ease",
-                          }}
-                        >
-                          <div
-                            style={{
-                              padding: "10px 16px",
-                              borderRadius: 12,
-                              fontSize: 12,
-                              lineHeight: 1.5,
-                              color: "#e4e4e7",
-                              backgroundColor: "#1e293b",
-                              border: "1px solid #334155",
-                              textAlign: "center",
-                            }}
-                          >
-                            {msg.message}
-                          </div>
-                          <div style={{ fontSize: 9, color: "#64748b", marginTop: 4, textAlign: "center" }}>
-                            {formatTime(msg.created_at)}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={msg.id || msg._pendingId}
-                        style={{
-                          alignSelf: isVisitor ? "flex-end" : "flex-start",
-                          maxWidth: "80%",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: isVisitor ? "flex-end" : "flex-start",
-                          animation: isPending ? "vcw-fade-in-up 0.25s ease" : undefined,
-                        }}
-                      >
-                        <div
-                          style={{
-                            padding: "10px 14px",
-                            borderRadius: isVisitor ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                            fontSize: 13,
-                            lineHeight: 1.4,
-                            border: isVisitor ? "none" : "1px solid #3f3f46",
-                            wordBreak: "break-word",
-                            opacity: isPending && !isDelivered ? 0.7 : 1,
-                            transition: "opacity 0.3s ease",
-                          }}
-                          className={`${isVisitor ? "bg-gradient-to-r from-indigo-600 to-indigo-500" : "bg-[#27272a"}`}
-                        >
-                          {msg.message}
-                        </div>
-                        <div style={{ fontSize: 9, color: "#71717a", marginTop: 4, padding: "0 2px", display: "flex", alignItems: "center", gap: 4 }}>
-                          {isPending ? (
-                            isDelivered ? <DeliveredCheck /> : <SendingDots />
-                          ) : (
-                            <>
-                              {msg.sender_name || (isVisitor ? "You" : "Agent")} • {formatTime(msg.created_at)}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-                {/* Typing indicator — shown after visitor sends, hidden on agent reply or 30s timeout */}
-                {showTypingIndicator && <TypingIndicator />}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Footer */}
-              <form
-                onSubmit={handleSendMessage}
-                style={{
-                  padding: 12,
-                  backgroundColor: "#27272a",
-                  borderTop: "1px solid #3f3f46",
-                  display: "flex",
-                  gap: 8,
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder={
-                    chatStatus === "CLOSED"
-                      ? "This conversation is closed."
-                      : "Type your message..."
-                  }
-                  value={inputText}
-                  disabled={chatStatus === "CLOSED"}
-                  onChange={(e) => setInputText(e.target.value)}
+              return (
+                <div
+                  key={msg.id || msg._pendingId}
                   style={{
-                    flex: 1,
-                    padding: "10px 14px",
-                    backgroundColor: "#18181b",
-                    border: "1px solid #3f3f46",
-                    color: "#ffffff",
-                    borderRadius: 10,
-                    fontSize: 13,
-                    outline: "none",
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={chatStatus === "CLOSED" || !inputText.trim()}
-                  style={{
-                    padding: "10px 16px",
-                    backgroundColor: chatStatus === "CLOSED" || !inputText.trim() ? "#3f3f46" : "#0d9488",
-                    color: chatStatus === "CLOSED" || !inputText.trim() ? "#71717a" : "#ffffff",
-                    border: "none",
-                    borderRadius: 10,
-                    cursor: chatStatus === "CLOSED" || !inputText.trim() ? "not-allowed" : "pointer",
-                    fontWeight: "bold",
-                    fontSize: 13,
-                    transition: "background-color 0.2s ease",
+                    alignSelf: isVisitor ? "flex-end" : "flex-start",
+                    maxWidth: "80%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: isVisitor ? "flex-end" : "flex-start",
+                    animation: isPending ? "vcw-fade-in-up 0.25s ease" : undefined,
                   }}
                 >
-                  Send
-                </button>
-              </form>
-            </>
-          )}
+                  <div
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: isVisitor ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
+                      fontSize: 13,
+                      lineHeight: 1.4,
+                      border: isVisitor ? "none" : "1px solid #3f3f46",
+                      wordBreak: "break-word",
+                      opacity: isPending && !isDelivered ? 0.7 : 1,
+                      transition: "opacity 0.3s ease",
+                    }}
+                    className={`${isVisitor ? "bg-gradient-to-r from-indigo-600 to-indigo-500" : "bg-[#27272a]"}`}
+                  >
+                    {msg.message}
+                  </div>
+                  <div style={{ fontSize: 9, color: "#71717a", marginTop: 4, padding: "0 2px", display: "flex", alignItems: "center", gap: 4 }}>
+                    {isPending ? (
+                      isDelivered ? <DeliveredCheck /> : <SendingDots />
+                    ) : (
+                      <>
+                        {isVisitor ? "You" : (msg.sender_name || agentName || "TradeAdmin Support")} • {formatTime(msg.created_at)}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Typing indicator — shown after visitor sends, hidden on agent reply or 30s timeout */}
+            {showTypingIndicator && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Footer */}
+          <form
+            onSubmit={handleSendMessage}
+            style={{
+              padding: 12,
+              backgroundColor: "#27272a",
+              borderTop: "1px solid #3f3f46",
+              display: "flex",
+              gap: 8,
+            }}
+          >
+            <input
+              type="text"
+              placeholder={
+                chatStatus === "CLOSED"
+                  ? "This conversation is closed."
+                  : "Type your message..."
+              }
+              value={inputText}
+              disabled={chatStatus === "CLOSED"}
+              onChange={(e) => setInputText(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                backgroundColor: "#18181b",
+                border: "1px solid #3f3f46",
+                color: "#ffffff",
+                borderRadius: 10,
+                fontSize: 13,
+                outline: "none",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={chatStatus === "CLOSED" || !inputText.trim()}
+              style={{
+                padding: "10px 16px",
+                backgroundColor: chatStatus === "CLOSED" || !inputText.trim() ? "#3f3f46" : "#0d9488",
+                color: chatStatus === "CLOSED" || !inputText.trim() ? "#71717a" : "#ffffff",
+                border: "none",
+                borderRadius: 10,
+                cursor: chatStatus === "CLOSED" || !inputText.trim() ? "not-allowed" : "pointer",
+                fontWeight: "bold",
+                fontSize: 13,
+                transition: "background-color 0.2s ease",
+              }}
+            >
+              Send
+            </button>
+          </form>
         </div>
       )}
     </div>
