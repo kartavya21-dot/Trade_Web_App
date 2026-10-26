@@ -25,9 +25,221 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-4px); }
     }
+    @keyframes vcw-callout-pop {
+      0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes vcw-text-fade {
+      0%   { opacity: 0; transform: translateY(3px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes vcw-online-ping {
+      0%   { transform: scale(1); opacity: 0.85; }
+      70%  { transform: scale(2.3); opacity: 0; }
+      100% { transform: scale(2.3); opacity: 0; }
+    }
+    @keyframes vcw-badge-pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.15); }
+    }
   `;
   document.head.appendChild(style);
 }
+
+// ── Woman Support Specialist with Headphone SVG ──
+function SupportAgentAvatar({ size = 48, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 72 72"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ display: "block", flexShrink: 0 }}
+    >
+      <defs>
+        <linearGradient id="vcw-avatar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="50%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#4338ca" />
+        </linearGradient>
+
+        <linearGradient id="vcw-headset-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#0284c7" />
+        </linearGradient>
+
+        <linearGradient id="vcw-hair-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#3d2419" />
+          <stop offset="100%" stopColor="#22130c" />
+        </linearGradient>
+
+        <linearGradient id="vcw-shirt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0d9488" />
+          <stop offset="100%" stopColor="#0f766e" />
+        </linearGradient>
+      </defs>
+
+      {/* Circular backdrop */}
+      <circle cx="36" cy="36" r="36" fill="url(#vcw-avatar-bg)" />
+
+      {/* Hair (Back Silhouette) */}
+      <path
+        d="M20 33 C17 45 18 57 22 65 C26 67 46 67 50 65 C54 57 55 45 52 33 C52 18 20 18 20 33 Z"
+        fill="url(#vcw-hair-grad)"
+      />
+
+      {/* Body / Shoulders */}
+      <path
+        d="M15 72 C15 58 23 51 36 51 C49 51 57 58 57 72 Z"
+        fill="url(#vcw-shirt-grad)"
+      />
+
+      {/* Neck */}
+      <path
+        d="M31 44 L41 44 L41 52 C41 54 39 56 36 56 C33 56 31 54 31 52 Z"
+        fill="#fed7aa"
+      />
+
+      {/* Inner Collar V-neck */}
+      <path
+        d="M32 51 L36 56 L40 51 Z"
+        fill="#ffffff"
+        opacity="0.9"
+      />
+
+      {/* Face */}
+      <ellipse cx="36" cy="34" rx="14" ry="16" fill="#fed7aa" />
+
+      {/* Cheeks blush */}
+      <circle cx="26" cy="38" r="3" fill="#f43f5e" opacity="0.25" />
+      <circle cx="46" cy="38" r="3" fill="#f43f5e" opacity="0.25" />
+
+      {/* Eyes (friendly smiling curves) */}
+      <path
+        d="M28 32 C29 30 32 30 33 32"
+        stroke="#1e1b4b"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M39 32 C40 30 43 30 44 32"
+        stroke="#1e1b4b"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* Eyebrows */}
+      <path
+        d="M27 27 C29 25.5 32 26 33 27.5"
+        stroke="#3d2419"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M39 27.5 C40 26 43 25.5 45 27"
+        stroke="#3d2419"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* Friendly Smile */}
+      <path
+        d="M32 40 C34 43.5 38 43.5 40 40"
+        stroke="#e11d48"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* Hair (Front Bangs / Framing) */}
+      <path
+        d="M22 28 C26 19 33 20 37 25 C42 20 48 24 50 29 C47 24 42 23 37 26 C32 22 26 24 22 28 Z"
+        fill="url(#vcw-hair-grad)"
+      />
+      <path
+        d="M22 28 C21 37 23 44 25 48 C24 42 23 35 24 29 Z"
+        fill="#3d2419"
+      />
+      <path
+        d="M50 28 C51 37 49 44 47 48 C48 42 49 35 48 29 Z"
+        fill="#3d2419"
+      />
+
+      {/* Headset Band */}
+      <path
+        d="M20 31 C20 15 52 15 52 31"
+        stroke="url(#vcw-headset-grad)"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* Headset Ear Cushions */}
+      <rect
+        x="17"
+        y="26"
+        width="5"
+        height="12"
+        rx="2.5"
+        fill="#0284c7"
+      />
+      <rect
+        x="18"
+        y="28"
+        width="3"
+        height="8"
+        rx="1.5"
+        fill="#38bdf8"
+      />
+
+      <rect
+        x="50"
+        y="26"
+        width="5"
+        height="12"
+        rx="2.5"
+        fill="#0284c7"
+      />
+      <rect
+        x="51"
+        y="28"
+        width="3"
+        height="8"
+        rx="1.5"
+        fill="#38bdf8"
+      />
+
+      {/* Microphone Boom Arm */}
+      <path
+        d="M52 33 C53 42.5 45 44 39 43"
+        stroke="#0284c7"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Microphone Tip */}
+      <rect
+        x="36"
+        y="41.5"
+        width="4.5"
+        height="3.2"
+        rx="1.6"
+        fill="#38bdf8"
+      />
+    </svg>
+  );
+}
+
+const CALLOUT_MESSAGES = [
+  "How can I help you? 👋",
+  "I am here to help you! 😊",
+];
 
 let pendingIdCounter = 0;
 
@@ -62,6 +274,10 @@ export default function VisitorChatWidget() {
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [awaitingReply, setAwaitingReply] = useState(false); // true when visitor sent a msg and no agent reply yet
+  const [calloutIndex, setCalloutIndex] = useState(0);
+  const [showCallout, setShowCallout] = useState(false);
+  const [calloutDismissed, setCalloutDismissed] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -78,6 +294,23 @@ export default function VisitorChatWidget() {
       if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
     };
   }, []);
+
+  // Show callout speech bubble after a brief delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowCallout(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Alternate callout message every 4 seconds
+  useEffect(() => {
+    if (!showCallout || calloutDismissed || isOpen) return;
+    const interval = setInterval(() => {
+      setCalloutIndex((prev) => (prev + 1) % CALLOUT_MESSAGES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [showCallout, calloutDismissed, isOpen]);
 
   // ── Start fake typing indicator + 30s auto-message timer ──
   const startReplyTimer = () => {
@@ -282,8 +515,12 @@ export default function VisitorChatWidget() {
   const handleToggleWidget = () => {
     const nextOpen = !isOpen;
     setIsOpen(nextOpen);
-    if (nextOpen && conversationId && hasSubmittedForm) {
-      fetchHistory(conversationId, visitorUuid);
+    setHasInteracted(true);
+    if (nextOpen) {
+      setShowCallout(false);
+      if (conversationId && hasSubmittedForm) {
+        fetchHistory(conversationId, visitorUuid);
+      }
     }
   };
 
@@ -446,31 +683,201 @@ export default function VisitorChatWidget() {
 
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 99999, fontFamily: "sans-serif" }}>
-      {/* Floating Widget Trigger Button */}
-      {!isOpen && (
-        <button
+      {/* Speech Bubble / Callout */}
+      {!isOpen && showCallout && !calloutDismissed && (
+        <div
           onClick={handleToggleWidget}
           style={{
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "50%",
-            width: 60,
-            height: 60,
-            cursor: "pointer",
-            fontSize: 26,
-            boxShadow: "0 8px 24px rgba(13, 148, 136, 0.4)",
+            position: "absolute",
+            right: 78,
+            bottom: 8,
+            backgroundColor: "#18181b",
+            border: "1px solid #3f3f46",
+            borderRadius: 16,
+            padding: "10px 14px",
+            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.2)",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            transition: "transform 0.2s ease",
+            gap: 10,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            animation: "vcw-callout-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            zIndex: 99998,
+            maxWidth: "calc(100vw - 120px)",
+            userSelect: "none",
           }}
-          className="bg-gradient-to-r from-indigo-600 to-indigo-500"
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          title="Open Customer Support Chat"
         >
-          💬
-        </button>
+          {/* Arrow pointing right towards avatar */}
+          <div
+            style={{
+              position: "absolute",
+              right: -6,
+              bottom: 22,
+              width: 12,
+              height: 12,
+              backgroundColor: "#18181b",
+              borderRight: "1px solid #3f3f46",
+              borderTop: "1px solid #3f3f46",
+              transform: "rotate(45deg)",
+            }}
+          />
+
+          {/* Live pulsing green dot */}
+          <div style={{ position: "relative", width: 8, height: 8, flexShrink: 0 }}>
+            <span
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                backgroundColor: "#22c55e",
+                animation: "vcw-online-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+              }}
+            />
+            <span
+              style={{
+                position: "relative",
+                display: "block",
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: "#22c55e",
+              }}
+            />
+          </div>
+
+          {/* Text content with keyframe animation on index change */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <span
+              style={{
+                fontSize: 10,
+                color: "#a1a1aa",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
+            >
+              Live Support
+            </span>
+            <span
+              key={calloutIndex}
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#ffffff",
+                animation: "vcw-text-fade 0.35s ease",
+              }}
+            >
+              {CALLOUT_MESSAGES[calloutIndex]}
+            </span>
+          </div>
+
+          {/* Dismiss button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCalloutDismissed(true);
+            }}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#71717a",
+              cursor: "pointer",
+              padding: "2px 4px",
+              marginLeft: 4,
+              fontSize: 14,
+              lineHeight: 1,
+              borderRadius: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            title="Dismiss"
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Floating Widget Trigger Button */}
+      {!isOpen && (
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={handleToggleWidget}
+            style={{
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "50%",
+              width: 64,
+              height: 64,
+              padding: 0,
+              cursor: "pointer",
+              boxShadow: "0 8px 28px rgba(99, 102, 241, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1) inset",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease",
+              background: "transparent",
+              position: "relative",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.08)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(99, 102, 241, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15) inset";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 8px 28px rgba(99, 102, 241, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1) inset";
+            }}
+            title="Chat with Support"
+          >
+            <SupportAgentAvatar size={64} />
+
+            {/* Online indicator dot on avatar */}
+            <span
+              style={{
+                position: "absolute",
+                bottom: 2,
+                right: 2,
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                backgroundColor: "#22c55e",
+                border: "2.5px solid #18181b",
+                boxShadow: "0 0 8px rgba(34, 197, 94, 0.8)",
+              }}
+            />
+          </button>
+
+          {/* Unread notification badge ("1") */}
+          {!hasInteracted && (
+            <span
+              style={{
+                position: "absolute",
+                top: -2,
+                right: -2,
+                minWidth: 20,
+                height: 20,
+                padding: "0 5px",
+                borderRadius: 10,
+                backgroundColor: "#ef4444",
+                color: "#ffffff",
+                fontSize: 11,
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "2px solid #18181b",
+                boxShadow: "0 2px 8px rgba(239, 68, 68, 0.6)",
+                pointerEvents: "none",
+                animation: "vcw-badge-pulse 2s infinite ease-in-out",
+              }}
+            >
+              1
+            </span>
+          )}
+        </div>
       )}
 
       {/* Floating Chat Panel */}
@@ -503,18 +910,17 @@ export default function VisitorChatWidget() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontWeight: "bold",
-                  fontSize: 14,
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
                 }}
-                className="bg-gradient-to-r from-indigo-600 to-indigo-500"
               >
-                🎧
+                <SupportAgentAvatar size={38} />
               </div>
               <div>
                 <strong style={{ display: "block", fontSize: 14, color: "#ffffff" }}>
