@@ -9,6 +9,8 @@ export default function ChatArea({
   onDeleteConversation,
   employeeId,
   role,
+  loadingMessages = false,
+  acceptingChatId = null,
 }) {
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef(null);
@@ -125,9 +127,16 @@ export default function ChatArea({
           {isWaiting && (
             <button
               onClick={() => onAcceptChat(activeChat.id)}
-              className="bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0F0F12] hover:opacity-90 font-semibold px-4 py-2 rounded-xl text-xs shadow-lg transition-opacity"
+              disabled={acceptingChatId === activeChat.id}
+              className="bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0F0F12] hover:opacity-90 font-semibold px-4 py-2 rounded-xl text-xs shadow-lg transition-opacity disabled:opacity-60 flex items-center gap-2"
             >
-              Accept Chat
+              {acceptingChatId === activeChat.id && (
+                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {acceptingChatId === activeChat.id ? "Accepting..." : "Accept Chat"}
             </button>
           )}
 
@@ -158,8 +167,18 @@ export default function ChatArea({
       </div>
 
       {/* Messages Log */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.length === 0 ? (
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 relative">
+        {/* Non-blocking message loading indicator */}
+        {loadingMessages && (
+          <div className="flex items-center justify-center gap-2 py-2">
+            <svg className="animate-spin h-4 w-4 text-[#00F2FE]" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-[11px] text-gray-400">Loading messages...</span>
+          </div>
+        )}
+        {!loadingMessages && messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-500 text-xs py-12">
             <span className="bg-[#26262E]/40 border border-[#26262E] px-3 py-1.5 rounded-full">
               No messages in this chat yet.

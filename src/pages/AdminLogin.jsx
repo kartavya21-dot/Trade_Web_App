@@ -24,6 +24,11 @@ export default function AdminLogin() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState({}); // { [chatId]: number }
 
+  // Loading states (non-blocking)
+  const [loadingQueues, setLoadingQueues] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [acceptingChatId, setAcceptingChatId] = useState(null);
+
   const wsRef = useRef(null);
   const selectedChatIdRef = useRef(null);
 
@@ -101,6 +106,7 @@ export default function AdminLogin() {
   // Fetch conversations queues
   const fetchQueues = async () => {
     if (!token) return;
+    setLoadingQueues(true);
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
@@ -138,12 +144,15 @@ export default function AdminLogin() {
       }
     } catch (e) {
       console.error("Failed to fetch queues:", e);
+    } finally {
+      setLoadingQueues(false);
     }
   };
 
   // Fetch messages for active chat
   const fetchMessages = async (chatId) => {
     if (!token || !chatId) return;
+    setLoadingMessages(true);
     try {
       const res = await fetch(
         getAdminApiUrl(`/conversations/${chatId}/messages`),
@@ -156,6 +165,8 @@ export default function AdminLogin() {
       }
     } catch (e) {
       console.error("Failed to fetch messages:", e);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -326,6 +337,7 @@ export default function AdminLogin() {
   };
 
   const handleAcceptChat = async (chatId) => {
+    setAcceptingChatId(chatId);
     try {
       const res = await fetch(
         getAdminApiUrl(`/conversations/${chatId}/accept`),
@@ -345,6 +357,8 @@ export default function AdminLogin() {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setAcceptingChatId(null);
     }
   };
 
@@ -429,7 +443,15 @@ export default function AdminLogin() {
   const isEmployeesView = activeTab === "employees" && user?.role === "ADMIN";
 
   return (
-    <div className="flex h-screen bg-[#0F0F12] text-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-[#0F0F12] text-gray-100 overflow-hidden relative">
+      {/* Non-blocking top loading bar for initial queue fetch */}
+      {loadingQueues && (
+        <div className="absolute top-0 left-0 right-0 z-50 h-0.5 bg-[#26262E] overflow-hidden pointer-events-none">
+          <div className="h-full w-1/3 bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] animate-[shimmer_1.2s_ease-in-out_infinite]"
+            style={{ animation: "shimmer 1.2s ease-in-out infinite" }} />
+          <style>{`@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }`}</style>
+        </div>
+      )}
       {/* 1. Sidebar Queue Controls */}
       <Sidebar
         waitingChats={waitingChats}
@@ -469,6 +491,8 @@ export default function AdminLogin() {
           onDeleteConversation={handleDeleteConversation}
           employeeId={user?.employee_id}
           role={user?.role}
+          loadingMessages={loadingMessages}
+          acceptingChatId={acceptingChatId}
         />
       )}
 
