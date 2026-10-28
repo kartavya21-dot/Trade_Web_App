@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import supportAgentImage from "../assets/support-agent.png";
 
 const API_BASE_URL = "https://hopeful-abundance-production-8087.up.railway.app";
 const WS_BASE_URL = "wss://hopeful-abundance-production-8087.up.railway.app";
@@ -46,193 +47,25 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
   document.head.appendChild(style);
 }
 
-// ── Woman Support Specialist with Headphone SVG ──
+// ── Support specialist portrait ──
 function SupportAgentAvatar({ size = 48, className = "" }) {
   return (
-    <svg
+    <img
+      src={supportAgentImage}
+      alt="TradeAdmin support specialist"
       width={size}
       height={size}
-      viewBox="0 0 72 72"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ display: "block", flexShrink: 0 }}
-    >
-      <defs>
-        <linearGradient id="vcw-avatar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6366f1" />
-          <stop offset="50%" stopColor="#4f46e5" />
-          <stop offset="100%" stopColor="#4338ca" />
-        </linearGradient>
-
-        <linearGradient id="vcw-headset-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="100%" stopColor="#0284c7" />
-        </linearGradient>
-
-        <linearGradient id="vcw-hair-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#3d2419" />
-          <stop offset="100%" stopColor="#22130c" />
-        </linearGradient>
-
-        <linearGradient id="vcw-shirt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#0d9488" />
-          <stop offset="100%" stopColor="#0f766e" />
-        </linearGradient>
-      </defs>
-
-      {/* Circular backdrop */}
-      <circle cx="36" cy="36" r="36" fill="url(#vcw-avatar-bg)" />
-
-      {/* Hair (Back Silhouette) */}
-      <path
-        d="M20 33 C17 45 18 57 22 65 C26 67 46 67 50 65 C54 57 55 45 52 33 C52 18 20 18 20 33 Z"
-        fill="url(#vcw-hair-grad)"
-      />
-
-      {/* Body / Shoulders */}
-      <path
-        d="M15 72 C15 58 23 51 36 51 C49 51 57 58 57 72 Z"
-        fill="url(#vcw-shirt-grad)"
-      />
-
-      {/* Neck */}
-      <path
-        d="M31 44 L41 44 L41 52 C41 54 39 56 36 56 C33 56 31 54 31 52 Z"
-        fill="#fed7aa"
-      />
-
-      {/* Inner Collar V-neck */}
-      <path
-        d="M32 51 L36 56 L40 51 Z"
-        fill="#ffffff"
-        opacity="0.9"
-      />
-
-      {/* Face */}
-      <ellipse cx="36" cy="34" rx="14" ry="16" fill="#fed7aa" />
-
-      {/* Cheeks blush */}
-      <circle cx="26" cy="38" r="3" fill="#f43f5e" opacity="0.25" />
-      <circle cx="46" cy="38" r="3" fill="#f43f5e" opacity="0.25" />
-
-      {/* Eyes (friendly smiling curves) */}
-      <path
-        d="M28 32 C29 30 32 30 33 32"
-        stroke="#1e1b4b"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M39 32 C40 30 43 30 44 32"
-        stroke="#1e1b4b"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Eyebrows */}
-      <path
-        d="M27 27 C29 25.5 32 26 33 27.5"
-        stroke="#3d2419"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M39 27.5 C40 26 43 25.5 45 27"
-        stroke="#3d2419"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Friendly Smile */}
-      <path
-        d="M32 40 C34 43.5 38 43.5 40 40"
-        stroke="#e11d48"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Hair (Front Bangs / Framing) */}
-      <path
-        d="M22 28 C26 19 33 20 37 25 C42 20 48 24 50 29 C47 24 42 23 37 26 C32 22 26 24 22 28 Z"
-        fill="url(#vcw-hair-grad)"
-      />
-      <path
-        d="M22 28 C21 37 23 44 25 48 C24 42 23 35 24 29 Z"
-        fill="#3d2419"
-      />
-      <path
-        d="M50 28 C51 37 49 44 47 48 C48 42 49 35 48 29 Z"
-        fill="#3d2419"
-      />
-
-      {/* Headset Band */}
-      <path
-        d="M20 31 C20 15 52 15 52 31"
-        stroke="url(#vcw-headset-grad)"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Headset Ear Cushions */}
-      <rect
-        x="17"
-        y="26"
-        width="5"
-        height="12"
-        rx="2.5"
-        fill="#0284c7"
-      />
-      <rect
-        x="18"
-        y="28"
-        width="3"
-        height="8"
-        rx="1.5"
-        fill="#38bdf8"
-      />
-
-      <rect
-        x="50"
-        y="26"
-        width="5"
-        height="12"
-        rx="2.5"
-        fill="#0284c7"
-      />
-      <rect
-        x="51"
-        y="28"
-        width="3"
-        height="8"
-        rx="1.5"
-        fill="#38bdf8"
-      />
-
-      {/* Microphone Boom Arm */}
-      <path
-        d="M52 33 C53 42.5 45 44 39 43"
-        stroke="#0284c7"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Microphone Tip */}
-      <rect
-        x="36"
-        y="41.5"
-        width="4.5"
-        height="3.2"
-        rx="1.6"
-        fill="#38bdf8"
-      />
-    </svg>
+      style={{
+        display: "block",
+        flexShrink: 0,
+        width: size,
+        height: size,
+        objectFit: "cover",
+        objectPosition: "center 28%",
+        borderRadius: "50%",
+      }}
+    />
   );
 }
 
@@ -678,7 +511,7 @@ export default function VisitorChatWidget() {
   ];
 
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 99999, fontFamily: "sans-serif" }}>
+    <div style={{ position: "fixed", bottom: 16, right: 16, zIndex: 99999, fontFamily: "sans-serif" }}>
       {/* Speech Bubble / Callout */}
       {!isOpen && showCallout && !calloutDismissed && (
         <div
@@ -880,8 +713,9 @@ export default function VisitorChatWidget() {
       {isOpen && (
         <div
           style={{
-            width: 360,
-            height: 520,
+            width: "min(360px, calc(100vw - 32px))",
+            height: "min(520px, calc(100dvh - 32px))",
+            minHeight: 240,
             backgroundColor: "#18181b",
             color: "#f4f4f5",
             borderRadius: 20,
